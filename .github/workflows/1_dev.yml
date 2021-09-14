@@ -63,7 +63,11 @@ jobs:
         arch: [386, amd64, arm-7, arm-6, arm64]
         include:
           - platform: darwin
+            arch: 386
+          - platform: darwin
             arch: amd64
+          - platform: windows
+            arch: 386
           - platform: windows
             arch: amd64
 
@@ -97,7 +101,7 @@ jobs:
       - name: Set Windows Build Flags
         if: matrix.platform == 'windows'
         run: |
-          echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
+          echo "BUILD_FLAGS=-extldflags -static -buildmode=exe" >> $GITHUB_ENV
           echo "XGO_TAGS=netgo osusergo sqlite_omit_load_extension" >> $GITHUB_ENV
         shell: bash
 
@@ -139,15 +143,42 @@ jobs:
           rm -rf statping.exe
           echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
 
-      - name: Compress Darwin Builds
-        if: matrix.platform == 'darwin'
+      - name: Compress Darwin 32bit Builds
+        if: matrix.platform == 'darwin' && matrix.arch == '386'
         run: |
           cd build
-          mv statping-darwin-10.6-${{ matrix.arch }} statping
+          ls >> $GITHUB_ENV
+#          mv statping-darwin-10.6-${{ matrix.arch }} statping
+#          chmod +x statping
+#          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz *
+#          rm -rf statping
+#          echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
+
+      - name: Compress Darwin 64bit Builds
+        if: matrix.platform == 'darwin' && matrix.arch == 'amd64'
+        run: |
+          cd build
+          mv statping-darwin-10.12-${{ matrix.arch }} statping
           chmod +x statping
           tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
           rm -rf statping
           echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
+
+#      - name: Compress Darwin arm64 Builds
+#        if: matrix.platform == 'darwin' && matrix.arch == 'arm64'
+#        run: |
+#          cd build
+#          mv statping-darwin-10.15-${{ matrix.arch }} statping
+#          chmod +x statping
+#          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
+#          rm -rf statping
+#          echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
+
+      - name: Upload Compiled Statping Binary
+        uses: actions/upload-artifact@v1
+        with:
+          name: statping-${{ matrix.platform }}-${{ matrix.arch }}
+          path: ./build
 
   test:
     needs: frontend

@@ -4,7 +4,7 @@ services:
 
   statping_dev:
     container_name: statping_dev
-    image: statping/statping:dev
+    image: statping-ng/statping-ng:dev
     restart: on-failure
     volumes:
       - ./cmd:/go/src/github.com/statping-ng/statping-ng/cmd/

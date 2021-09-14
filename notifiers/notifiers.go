@@ -26,6 +26,7 @@ type replacer struct {
 func InitNotifiers() {
 	Add(
 		slacker,
+		mattermoster,
 		Command,
 		Discorder,
 		email,

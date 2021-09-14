@@ -23,7 +23,7 @@ require (
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.6.3
-	github.com/statping/emails v1.0.0
+	github.com/statping-ng/emails v1.0.3
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.6.1
 	github.com/t-tiger/gorm-bulk-insert/v2 v2.0.1
