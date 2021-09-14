@@ -97,7 +97,7 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 	} else {
 		req.Header.Add("Content-Type", "application/json")
 	}
-	req.Header.Set("User-Agent", "Statping")
+	req.Header.Set("User-Agent", "Statping-ng")
 	req.Header.Set("Statping-Version", utils.Params.GetString("VERSION"))
 
 	var customHeaders []string
