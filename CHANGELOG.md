@@ -1,4 +1,5 @@
 # 0.90.78 (xx-xx-2021)
+- New Notifier - Mattermost
 - Updated German Language - Thanks Flofeld
 - Czech Language - Thanks Fjuro
 - Some minor branding Changes
