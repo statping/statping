@@ -4205,7 +4205,7 @@
 									"",
 									"pm.test(\"View All Notifiers\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.length).to.eql(13);",
+									"    pm.expect(jsonData.length).to.eql(14);",
 									"});"
 								],
 								"type": "text/javascript"
