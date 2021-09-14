@@ -35,7 +35,7 @@ func TestMattermostNotifier(t *testing.T) {
 		t.SkipNow()
 	}
 
-	mattermoster.Host = null.NewNullString(SLACK_URL)
+	mattermoster.Host = null.NewNullString(MATTERMOST_URL)
 	mattermoster.Enabled = null.NewNullBool(true)
 
 	t.Run("Load mattermost", func(t *testing.T) {

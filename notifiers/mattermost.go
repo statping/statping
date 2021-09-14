@@ -51,7 +51,7 @@ var mattermoster = &mattermost{&notifications.Notification{
 	}}},
 }
 
-// Send will send a HTTP Post to the slack webhooker API. It accepts type: string
+// Send will send a HTTP Post to the mattermost webhooker API. It accepts type: string
 func (s *mattermost) sendMattermost(msg string) (string, error) {
 	resp, _, err := utils.HttpRequest(s.Host.String, "POST", "application/json", nil, strings.NewReader(msg), time.Duration(10*time.Second), true, nil)
 	if err != nil {
