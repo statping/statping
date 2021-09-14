@@ -1,4 +1,5 @@
 # 0.90.78 (xx-xx-2021)
+- Modified Telegram notifier to allow chat_ids
 - New Notifier - Mattermost
 - Updated German Language - Thanks Flofeld
 - Czech Language - Thanks Fjuro
