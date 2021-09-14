@@ -282,7 +282,7 @@ export default {
         this.notifier.form.forEach((f) => {
           let field = f.field.toLowerCase()
           let val = this.notifier[field]
-          if (this.isNumeric(val)) {
+          if (this.isNumeric(val) && this.form.method!='telegram') {
             val = parseInt(val)
           }
           this.form[field] = val
@@ -304,7 +304,7 @@ export default {
         this.notifier.form.forEach((f) => {
           let field = f.field.toLowerCase()
           let val = this.notifier[field]
-          if (this.isNumeric(val)) {
+          if (this.isNumeric(val) && this.form.method!='telegram') {
             val = parseInt(val)
           }
           this.form[field] = val
