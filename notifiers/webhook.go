@@ -121,7 +121,6 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 		}
 	}
 
-	utils.Log.Infoln(fmt.Sprintf("sending body: '%v' to %v as a %v request with headers: '%v'", body, w.Host.String, w.Var1.String, req.Header))
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
