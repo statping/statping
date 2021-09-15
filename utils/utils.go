@@ -174,7 +174,7 @@ func HttpRequest(endpoint, method string, contentType interface{}, headers []str
 		return nil, nil, err
 	}
 	// set default headers so end user can overwrite them if needed
-	req.Header.Set("User-Agent", "Statping")
+	req.Header.Set("User-Agent", "Statping-ng")
 	req.Header.Set("Statping-Version", Params.GetString("VERSION"))
 	req.Header.Set("Accept", "text/html")
 

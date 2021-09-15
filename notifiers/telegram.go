@@ -52,8 +52,8 @@ var Telegram = &telegram{&notifications.Notification{
 	}, {
 		Type:        "text",
 		Title:       "Channel",
-		Placeholder: "@statping_channel",
-		SmallText:   "Insert your Telegram Channel including the @ symbol. The bot will need to be an administrator of this channel.",
+		Placeholder: "@statping_channel/-123123512312",
+		SmallText:   "Insert your Telegram Channel including the @ symbol. The bot will need to be an administrator of this channel. You can also supply a chat_id.",
 		DbField:     "var1",
 		Required:    true,
 	}}},

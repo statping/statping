@@ -3,7 +3,7 @@ version: '2.3'
 services:
   statping:
     container_name: statping
-    image: aboutcher/statping-ng:dev
+    image: adamboutcher/statping-ng:latest
     restart: always
     volumes:
       - statping_data:/app

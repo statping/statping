@@ -1,27 +1,31 @@
 name: statping-ng
-version-script: cat version.txt
 version: "stable"
+version-script: cat version.txt
 summary: Statping-ng Server Monitoring with Status Page
-description: >
+description: |
   An easy to use Status Page for your websites and applications.
   Statping will automatically fetch the application and render a beautiful
   status page with tons of features for you to build an even better status page.
   This Status Page generator allows you to use MySQL, Postgres, or SQLite
   on multiple operating systems.
 
+base: core18
+build-base: core18
 type: app
 confinement: strict
 grade: stable
+license: GPL-3.0
 
 architectures:
+  - build-on: i386
   - build-on: amd64
   - build-on: armhf
   - build-on: arm64
-  - build-on: i386
 
 apps:
   statping:
-    command: statping
+    command: bin/statping
+    daemon: simple
     plugs:
       - home
       - network
@@ -32,12 +36,10 @@ parts:
     source: .
     plugin: nil
     override-build: |
-      apt-get update
-      apt-get install -y curl
-      curl -o- -L https://raw.githubusercontent.com/statping-ng/statping-ng/stable/install.sh | bash
-      mv /usr/local/bin/statping ./
+      curl -o- -L https://raw.githubusercontent.com/adamboutcher/statping-ng/dev/install.sh | bash
     build-packages:
-      - git
-      - gcc
-      - make
-      - sed
+      - tar
+      - curl
+      - bash
+    organize:
+      /usr/local/bin/statping: bin/
