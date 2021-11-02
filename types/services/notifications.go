@@ -44,7 +44,7 @@ func sendSuccess(s *Service) {
 	}
 
 	s.prevOnline = true
-	s.notifyAfterCount++
+	s.notifyAfterCount = 0
 }
 
 func sendFailure(s *Service, f *failures.Failure) {
