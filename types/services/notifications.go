@@ -80,7 +80,6 @@ func sendFailure(s *Service, f *failures.Failure) {
 	}
 
 	s.prevOnline = false
-	s.notifyAfterCount++
 }
 
 func logMessage(method string, msg string, error error, onSuccesss bool, serviceId int64) {
