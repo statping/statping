@@ -17,7 +17,7 @@ import (
 	"net/http"
 	"time"
 )
-
+//local statping setup
 type apiResponse struct {
 	Status string      `json:"status"`
 	Object string      `json:"type,omitempty"`
