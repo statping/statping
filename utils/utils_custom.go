@@ -32,9 +32,12 @@ func DirWritable(path string) (bool, error) {
 		return false, errors.New("unable to get stat")
 	}
 
-	if uint32(os.Geteuid()) != stat.Uid {
+	/*if uint32(os.Geteuid()) != stat.Uid {
+		fmt.Println(os.Geteuid())
+		fmt.Println(stat.Uid )
+
 		return false, errors.New("user doesn't have permission to write to this directory")
-	}
+	}*/
 	return true, nil
 }
 
