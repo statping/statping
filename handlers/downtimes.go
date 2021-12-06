@@ -24,10 +24,7 @@ func findDowntime(r *http.Request) (*downtimes.Downtime, error) {
 func apiAllDowntimes(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	fmt.Println(vars)
-	ninetyDaysAgo := time.Now().Add(time.Duration(-90*24) * time.Hour)
-	start := ninetyDaysAgo
-	end := time.Now()
-	downtime,err := downtimes.FindAll(vars,start, end)
+	downtime,err := downtimes.FindAll(vars)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return

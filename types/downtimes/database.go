@@ -3,7 +3,6 @@ package downtimes
 import (
 	"fmt"
 	"github.com/statping/statping/database"
-	"github.com/statping/statping/types/services"
 	"strconv"
 	"time"
 )
@@ -74,38 +73,49 @@ type invalidTimeDurationError struct{}
 func (m *invalidTimeDurationError) Error() string {
 	return "invalid time duration"
 }
-func FindAll(vars map[string]string ,start time.Time, end time.Time) (*[]Downtime, error) {
+func FindAll(vars map[string]string ) (*[]Downtime, error) {
 	var downtime []Downtime
-	q := db.Where("start BETWEEN ? AND ? ", start, end)
-	for key,val :=range vars{
-		switch key{
-		case "start":
-			_,ok := vars["end"]
-			if ok && (vars["end"]>vars["start"]) {
-				start,err := ConvertToUnixTime(vars["start"])
-				if err!=nil {
-					return &downtime,err
-				}
-				end,err := ConvertToUnixTime(vars["end"])
-				if err!=nil {
-					return &downtime,err
-				}
-				q = q.Where("start BETWEEN ? AND ? ", start, end)
-			}else {
-				return &downtime,&invalidTimeDurationError{}
-			}
-		case "sub_status":
-			q = q.Where(" sub_status = ?",val)
-		case "service":
-			allServices := services.All()
-			for k,v := range allServices{
-			if v.Name == val {
-				q = q.Where(" service = ?",k)
-				}
-			}
-		case "type":
-			q = q.Where(" type = ?",val)
+	var start time.Time
+	var end time.Time
+	var err error
+	var count int64
+	st,ok1 := vars["start"]
+	en,ok2 := vars["end"]
+	if ok1 && ok2 && (en > st){
+		start,err = ConvertToUnixTime(vars["start"])
+		if err!=nil {
+			return &downtime,err
 		}
+		end,err = ConvertToUnixTime(vars["end"])
+		if err!=nil {
+			return &downtime,err
+		}
+	}else{
+		ninetyDaysAgo := time.Now().Add(time.Duration(-90*24) * time.Hour)
+		start = ninetyDaysAgo
+		end = time.Now()
+	}
+	q := db.Where("start BETWEEN ? AND ? ", start, end)
+	subStatus,ok3 := vars["sub_status"]
+	if ok3{
+		q = q.Where(" sub_status = ?", subStatus)
+	}
+	service,ok4 := vars["service"]
+	if ok4{
+		q = q.Where(" service = ?", service)
+	}
+	ty,ok5 := vars["type"]
+	if ok5{
+		q = q.Where(" type = ?", ty)
+	}
+	cnt,ok5 := vars["count"]
+	if ok5{
+		count,err = strconv.ParseInt(cnt,10,64)
+		if count > 100 {
+			count = 100
+		}
+	}else {
+		count = 20
 	}
 	q = q.Order("id ASC ").Find(&downtime)
 	return &downtime, q.Error()
