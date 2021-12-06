@@ -2,6 +2,7 @@ package configs
 
 import (
 	"errors"
+	"fmt"
 	"github.com/statping/statping/utils"
 	"gopkg.in/yaml.v2"
 	"os"
@@ -44,12 +45,14 @@ func LoadConfigs(cfgFile string) (*DbConfig, error) {
 	if env, ok := os.LookupEnv("APP_ENV"); ok {
 		fileName = "/configs/" + env + ".yml"
 	}
-
+	fmt.Println("1")
 	cfgFile = utils.Directory + fileName
+	fmt.Println(utils.Directory)
 	writeAble, err := utils.DirWritable(utils.Directory)
 	if err != nil {
 		return nil, err
 	}
+
 	if !writeAble {
 		return nil, errors.New("Directory %s is not writable: " + utils.Directory)
 	}
@@ -141,7 +144,7 @@ func LoadConfigs(cfgFile string) (*DbConfig, error) {
 	}
 
 	log.Infof("Set db env vars")
-
+	fmt.Println("4")
 	configs := &DbConfig{
 		DbConn:             p.GetString("DB_CONN"),
 		DbHost:             p.GetString("DB_HOST"),
@@ -175,5 +178,6 @@ func LoadConfigs(cfgFile string) (*DbConfig, error) {
 	if configs.DbConn == "" {
 		return configs, errors.New("Starting in setup mode")
 	}
+	fmt.Println("5")
 	return configs, nil
 }
