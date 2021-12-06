@@ -3,6 +3,8 @@ package downtimes
 import (
 	"fmt"
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/services"
+	"strconv"
 	"time"
 )
 
@@ -58,6 +60,56 @@ func FindByService(service int64, start time.Time, end time.Time) (*[]Downtime, 
 	return &downtime, q.Error()
 }
 
+func ConvertToUnixTime(str string) (time.Time,error){
+	i, err := strconv.ParseInt(str, 10, 64)
+	var t time.Time
+	if err != nil {
+		return t,err
+	}
+	tm := time.Unix(i, 0)
+	return tm,nil
+}
+type invalidTimeDurationError struct{}
+
+func (m *invalidTimeDurationError) Error() string {
+	return "invalid time duration"
+}
+func FindAll(vars map[string]string ,start time.Time, end time.Time) (*[]Downtime, error) {
+	var downtime []Downtime
+	q := db.Where("start BETWEEN ? AND ? ", start, end)
+	for key,val :=range vars{
+		switch key{
+		case "start":
+			_,ok := vars["end"]
+			if ok && (vars["end"]>vars["start"]) {
+				start,err := ConvertToUnixTime(vars["start"])
+				if err!=nil {
+					return &downtime,err
+				}
+				end,err := ConvertToUnixTime(vars["end"])
+				if err!=nil {
+					return &downtime,err
+				}
+				q = q.Where("start BETWEEN ? AND ? ", start, end)
+			}else {
+				return &downtime,&invalidTimeDurationError{}
+			}
+		case "sub_status":
+			q = q.Where(" sub_status = ?",val)
+		case "service":
+			allServices := services.All()
+			for k,v := range allServices{
+			if v.Name == val {
+				q = q.Where(" service = ?",k)
+				}
+			}
+		case "type":
+			q = q.Where(" type = ?",val)
+		}
+	}
+	q = q.Order("id ASC ").Find(&downtime)
+	return &downtime, q.Error()
+}
 func (c *Downtime) Create() error {
 	q := db.Create(c)
 	return q.Error()
