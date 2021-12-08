@@ -7,6 +7,7 @@ import (
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -21,15 +22,33 @@ func findDowntime(r *http.Request) (*downtimes.Downtime, error) {
 	return downtime, nil
 }
 
+func convertToMap(query url.Values) map[string]string{
+	vars := make(map[string]string)
+	if query.Get("start")!= "" {
+		vars["start"] = query.Get("start")
+	}
+	if query.Get("end")!= "" {
+		vars["end"] = query.Get("end")
+	}
+	if query.Get("sub_status")!= "" {
+		vars["sub_status"] = query.Get("sub_status")
+	}
+	if query.Get("service_id")!= "" {
+		vars["service_id"] = query.Get("service_id")
+	}
+	if query.Get("type")!= "" {
+		vars["type"] = query.Get("type")
+	}
+	return vars
+}
 func apiAllDowntimes(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	fmt.Println(vars)
+	query := r.URL.Query()
+	vars:=convertToMap(query)
 	downtime,err := downtimes.FindAll(vars)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	fmt.Println(downtime)
 	sendJsonAction(downtime, "fetch", w, r)
 }
 

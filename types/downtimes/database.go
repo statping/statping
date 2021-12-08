@@ -79,9 +79,9 @@ func FindAll(vars map[string]string ) (*[]Downtime, error) {
 	var end time.Time
 	var err error
 	var count int64
-	st,ok1 := vars["start"]
-	en,ok2 := vars["end"]
-	if ok1 && ok2 && (en > st){
+	st,err1 := vars["start"]
+	en,err2 := vars["end"]
+	if err1 && err2 && (en > st){
 		start,err = ConvertToUnixTime(vars["start"])
 		if err!=nil {
 			return &downtime,err
@@ -96,20 +96,20 @@ func FindAll(vars map[string]string ) (*[]Downtime, error) {
 		end = time.Now()
 	}
 	q := db.Where("start BETWEEN ? AND ? ", start, end)
-	subStatus,ok3 := vars["sub_status"]
-	if ok3{
+	subStatus,err3 := vars["sub_status"]
+	if err3{
 		q = q.Where(" sub_status = ?", subStatus)
 	}
-	service,ok4 := vars["service"]
-	if ok4{
-		q = q.Where(" service = ?", service)
+	serviceId,err4 := vars["service_id"]
+	if err4{
+		q = q.Where(" service = ?", serviceId)
 	}
-	ty,ok5 := vars["type"]
-	if ok5{
+	ty,err5 := vars["type"]
+	if err5{
 		q = q.Where(" type = ?", ty)
 	}
-	cnt,ok5 := vars["count"]
-	if ok5{
+	cnt,err5 := vars["count"]
+	if err5{
 		count,err = strconv.ParseInt(cnt,10,64)
 		if count > 100 {
 			count = 100
