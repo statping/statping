@@ -39,6 +39,12 @@ func convertToMap(query url.Values) map[string]string{
 	if query.Get("type")!= "" {
 		vars["type"] = query.Get("type")
 	}
+	if query.Get("skip")!= "" {
+		vars["skip"] = query.Get("skip")
+	}
+	if query.Get("count")!= "" {
+		vars["count"] = query.Get("count")
+	}
 	return vars
 }
 func apiAllDowntimes(w http.ResponseWriter, r *http.Request) {

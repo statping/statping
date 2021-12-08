@@ -68,17 +68,14 @@ func ConvertToUnixTime(str string) (time.Time,error){
 	tm := time.Unix(i, 0)
 	return tm,nil
 }
-type invalidTimeDurationError struct{}
 
-func (m *invalidTimeDurationError) Error() string {
-	return "invalid time duration"
-}
 func FindAll(vars map[string]string ) (*[]Downtime, error) {
 	var downtime []Downtime
 	var start time.Time
 	var end time.Time
 	var err error
 	var count int64
+	var skip int64
 	st,err1 := vars["start"]
 	en,err2 := vars["end"]
 	if err1 && err2 && (en > st){
@@ -117,7 +114,14 @@ func FindAll(vars map[string]string ) (*[]Downtime, error) {
 	}else {
 		count = 20
 	}
-	q = q.Order("id ASC ").Find(&downtime)
+	skp,err6:=vars["skip"]
+	if err6{
+		skip,err = strconv.ParseInt(skp,10,64)
+	}else {
+		skip = 0
+	}
+	q = q.Order("id ASC ")
+	q = q.Limit((int)(count)).Offset((int)(skip)).Find(&downtime)
 	return &downtime, q.Error()
 }
 func (c *Downtime) Create() error {
