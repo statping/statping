@@ -24,25 +24,25 @@ func findDowntime(r *http.Request) (*downtimes.Downtime, error) {
 
 func convertToMap(query url.Values) map[string]string{
 	vars := make(map[string]string)
-	if query.Get("start")!= "" {
+	if query.Get("start") != "" {
 		vars["start"] = query.Get("start")
 	}
-	if query.Get("end")!= "" {
+	if query.Get("end") != "" {
 		vars["end"] = query.Get("end")
 	}
-	if query.Get("sub_status")!= "" {
+	if query.Get("sub_status") != "" {
 		vars["sub_status"] = query.Get("sub_status")
 	}
-	if query.Get("service_id")!= "" {
+	if query.Get("service_id") != "" {
 		vars["service_id"] = query.Get("service_id")
 	}
-	if query.Get("type")!= "" {
+	if query.Get("type") != "" {
 		vars["type"] = query.Get("type")
 	}
 	if query.Get("skip")!= "" {
 		vars["skip"] = query.Get("skip")
 	}
-	if query.Get("count")!= "" {
+	if query.Get("count") != "" {
 		vars["count"] = query.Get("count")
 	}
 	return vars

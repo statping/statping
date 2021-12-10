@@ -73,18 +73,17 @@ func FindAll(vars map[string]string ) (*[]Downtime, error) {
 	var downtime []Downtime
 	var start time.Time
 	var end time.Time
-	var err error
-	var count int64
-	var skip int64
 	st,err1 := vars["start"]
 	en,err2 := vars["end"]
-	if err1 && err2 && (en > st){
+	startInt,err := strconv.ParseInt(st,10,64)
+	endInt,err := strconv.ParseInt(en,10,64)
+	if err1 && err2 && (endInt > startInt){
 		start,err = ConvertToUnixTime(vars["start"])
-		if err!=nil {
+		if err != nil {
 			return &downtime,err
 		}
 		end,err = ConvertToUnixTime(vars["end"])
-		if err!=nil {
+		if err != nil {
 			return &downtime,err
 		}
 	}else{
@@ -92,35 +91,32 @@ func FindAll(vars map[string]string ) (*[]Downtime, error) {
 		start = ninetyDaysAgo
 		end = time.Now()
 	}
-	q := db.Where("start BETWEEN ? AND ? ", start, end)
-	subStatus,err3 := vars["sub_status"]
-	if err3{
-		q = q.Where(" sub_status = ?", subStatus)
+	q := db.Where("start BETWEEN ? AND ?", start, end)
+	if subStatusVar,subStatusErr := vars["sub_status"]; subStatusErr{
+		q = q.Where("sub_status = ?", subStatusVar)
 	}
-	serviceId,err4 := vars["service_id"]
-	if err4{
-		q = q.Where(" service = ?", serviceId)
+	if serviceIdVar,serviceIdErr := vars["service_id"]; serviceIdErr{
+		q = q.Where("service = ?", serviceIdVar)
 	}
-	ty,err5 := vars["type"]
-	if err5{
-		q = q.Where(" type = ?", ty)
+	if typeVar,typeErr := vars["type"]; typeErr{
+		q = q.Where("type = ?", typeVar)
 	}
-	cnt,err5 := vars["count"]
-	if err5{
-		count,err = strconv.ParseInt(cnt,10,64)
+	var count int64
+	if countVar,countErr := vars["count"]; countErr{
+		count,err = strconv.ParseInt(countVar,10,64)
 		if count > 100 {
 			count = 100
 		}
 	}else {
 		count = 20
 	}
-	skp,err6:=vars["skip"]
-	if err6{
-		skip,err = strconv.ParseInt(skp,10,64)
+	var skip int64
+	if skipVar,err6 := vars["skip"]; err6{
+		skip,err = strconv.ParseInt(skipVar,10,64)
 	}else {
 		skip = 0
 	}
-	q = q.Order("id ASC ")
+	q = q.Order("id ASC")
 	q = q.Limit((int)(count)).Offset((int)(skip)).Find(&downtime)
 	return &downtime, q.Error()
 }
