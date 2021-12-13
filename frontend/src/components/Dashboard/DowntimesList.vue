@@ -82,7 +82,8 @@
           </td>
           <td class="d-none d-md-table-cell">
             <span
-              class=""
+              class="badge text-uppercase"
+              :class="[downtime.sub_status === 'down' ? 'badge-danger' : 'badge-warning' ]"
             >
               {{ downtime.sub_status }}
             </span>
