@@ -17,6 +17,7 @@
       <button
         class="btn btn-outline-secondary page-link"
         aria-label="Next"
+        :disabled="downtimes.length < count"
         @click="getNextDowntimes"
       >
         <span aria-hidden="true">
@@ -28,8 +29,14 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
     props: {
+        count:{
+            type: Number,
+            default: 10,
+        },
         getNextDowntimes: {
             type: Function,
             default: function () {}
@@ -42,6 +49,10 @@ export default {
             type: Number,
             default: 0,
         }
-    }
+    },
+    computed: {
+        ...mapState([ 'downtimes' ])
+    },
+
 };
 </script>

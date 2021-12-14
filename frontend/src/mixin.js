@@ -51,6 +51,9 @@ export default Vue.mixin({
         niceDate (val) {
             return format(parseISO(val), 'EEE, MMM do h:mma');
         },
+        niceDateWithYear (val) {
+            return format(parseISO(val), 'EEE, do MMM yyyy \'at\' h:mma');
+        },
         parseISO (v) {
             return parseISO(v);
         },

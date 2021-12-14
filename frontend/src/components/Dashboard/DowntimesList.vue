@@ -53,16 +53,8 @@
           :key="downtime.id"
         >
           <td>
-            <span
-              v-if="$store.state.admin"
-              class="drag_icon d-none d-md-inline"
-            >
-              <FontAwesomeIcon
-                icon="bars"
-                class="mr-3"
-              />
-            </span>
             <span>
+              <!-- {{ serviceById(downtime.service_id).name }} -->
               {{ downtime.service_id }}
             </span>
           </td>
@@ -70,14 +62,14 @@
             <span
               class=""
             >
-              {{ niceDate(downtime.start) }}
+              {{ niceDateWithYear(downtime.start) }}
             </span>
           </td>
           <td class="d-none d-md-table-cell">
             <span
               class=""
             >
-              {{ niceDate(downtime.end) }}
+              {{ niceDateWithYear(downtime.end) }}
             </span>
           </td>
           <td class="d-none d-md-table-cell">
@@ -130,7 +122,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 export default {
     data: function () {
@@ -139,7 +131,8 @@ export default {
         };
     },
     computed: {
-        ...mapState([ 'downtimes' ])
+        ...mapState([ 'downtimes' ]),
+        ...mapGetters([ 'serviceById' ])
     }
 };
 </script>
