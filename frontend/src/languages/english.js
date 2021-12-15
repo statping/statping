@@ -6,6 +6,7 @@ const english = {
     actions: 'Actions',
     services: 'Services',
     downtimes: 'Downtimes',
+    downtime_info: 'Downtime Info',
     filters: 'Filters',
     service: 'Service',
     clear: 'Clear',

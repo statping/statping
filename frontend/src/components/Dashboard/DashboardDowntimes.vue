@@ -1,46 +1,49 @@
 <template>
-  <div class="row">
+  <div class="col-12">
     <DowntimesFilterForm
       :handle-clear-filters="handleClearFilters"
       :params="params"
       :handle-filter-search="handleFilterSearch"
     />
-    <div class="col-12">
-      <div class="card contain-card mb-4">
-        <div class="card-header">
-          {{ $t('downtimes') }}
-        <!-- <router-link
+    
+    <div class="card contain-card mb-4">
+      <div class="card-header">
+        {{ $t('downtimes') }}
+        <router-link
           v-if="$store.state.admin"
-          to="/dashboard/create_service"
+          to="/dashboard/create_downtime"
           class="btn btn-sm btn-success float-right"
         >
           <FontAwesomeIcon icon="plus" />  {{ $t('create') }}
-        </router-link> -->
-        </div>
-        <div class="card-body pt-0">
-          <div
-            v-if="isLoading"
-            class="loader d-flex align-items-center justify-content-center"
-          >
-            <div
-              class="spinner-border"
-              role="status"
-            >
-              <span class="sr-only">
-                Loading...
-              </span>
-            </div>
-          </div>
-          <div v-else>
-            <DowntimesList />
-            <Pagination
-              v-if="downtimes.length !== 0"
-              :get-next-downtimes="getNextDowntimes"
-              :get-prev-downtimes="getPrevDowntimes"
-              :skip="params.skip"
-              :count="params.count"
+        </router-link>
+      </div>
+      <div class="card-body pt-0">
+        <div
+          v-if="isLoading"
+          class="mt-5"
+        >
+          <div class="col-12 text-center">
+            <FontAwesomeIcon
+              icon="circle-notch"
+              size="3x"
+              spin
             />
           </div>
+          <div class="col-12 text-center mt-3 mb-3">
+            <span class="text-muted">
+              Loading Downtimes
+            </span>
+          </div>
+        </div>
+        <div v-else>
+          <DowntimesList />
+          <Pagination
+            v-if="downtimes.length !== 0"
+            :get-next-downtimes="getNextDowntimes"
+            :get-prev-downtimes="getPrevDowntimes"
+            :skip="params.skip"
+            :count="params.count"
+          />
         </div>
       </div>
     </div>
@@ -105,9 +108,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-.loader {
-  min-height: 100px;
-}
-</style>

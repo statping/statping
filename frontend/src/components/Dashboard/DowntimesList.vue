@@ -125,6 +125,7 @@
 import { mapGetters, mapState } from 'vuex';
 
 export default {
+    name: 'DashboardDowntimeList',
     data: function () {
         return {
             isLoading: false,

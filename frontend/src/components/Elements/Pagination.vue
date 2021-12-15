@@ -32,6 +32,7 @@
 import { mapState } from 'vuex';
 
 export default {
+    name: 'DasboardDowntimePagination',
     props: {
         count:{
             type: Number,

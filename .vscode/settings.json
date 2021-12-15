@@ -2,5 +2,6 @@
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": true
 	},
-	"editor.defaultFormatter": null
+	"editor.defaultFormatter": null,
+  "eslint.validate": ["javascript"]
 }

@@ -387,10 +387,14 @@ class Api {
         await axios.all([ all ]);
     }
 
-    async getDowntimes ({ serviceId, start, end, skip, count, subStatus }) {
+    async downtimes ({ serviceId, start, end, skip, count, subStatus }) {
         return axios.get('api/downtimes', {
             params: { service_id: serviceId, start, end, skip, count, sub_status: subStatus }
         }).then((response) => response.data);
+    }
+
+    async downtime (id) {
+        return axios.get(`api/downtimes/${id}`).then((response) => response.data);
     }
 }
 const api = new Api();

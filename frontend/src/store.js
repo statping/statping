@@ -163,7 +163,7 @@ export default new Vuex.Store({
             context.commit('setServices', services);
         },
         async getDowntimes (context, { payload }) {
-            const { output } = await Api.getDowntimes(payload);
+            const { output } = await Api.downtimes(payload);
             context.commit('setDowntimes', output);
         },
         async loadCore (context) {

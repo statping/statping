@@ -16,7 +16,8 @@ const Checkins = () => import(/* webpackChunkName: "dashboard" */ '@/components/
 const Failures = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Failures');
 const NotFound = () => import(/* webpackChunkName: "index" */ '@/pages/NotFound');
 const Importer = () => import(/* webpackChunkName: "index" */ '@/components/Dashboard/Importer');
-const DashboardDowntimes = () => import(/* webpackChunkName: "downtimes" */ '@/components/Dashboard/DashboardDowntimes');
+const DashboardDowntimes = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/DashboardDowntimes');
+const EditDowntime = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/EditDowntime');
 
 import VueRouter from 'vue-router';
 import Api from './API';
@@ -144,6 +145,13 @@ const routes = [
             meta: {
                 requiresAuth: true,
                 title: 'Statping - Downtimes',
+            }
+        },{
+            path: 'create_downtime',
+            component: EditDowntime,
+            meta: {
+                requiresAuth: true,
+                title: 'Statping - Create Downtime',
             }
         },{
             path: 'messages',
