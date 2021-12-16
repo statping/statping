@@ -36,7 +36,6 @@ func InitNotifiers() {
 		Webhook,
 		Mobile,
 		Pushover,
-		statpingMailer,
 		Gotify,
 		AmazonSNS,
 	)
