@@ -47,15 +47,45 @@ func convertToMap(query url.Values) map[string]string{
 	}
 	return vars
 }
+
+type DowntimeService struct {
+	Id        int64      `gorm:"primary_key;column:id" json:"id"`
+	Service  *services.Service `gorm:"foreignKey:service" json:"service"`
+	ServiceId int64      `gorm:"index;column:service" json:"service_id"`
+	SubStatus string     `gorm:"column:sub_status" json:"sub_status"`
+	Failures  int        `gorm:"column:failures" json:"failures"`
+	Start     *time.Time `gorm:"index;column:start" json:"start"`
+	End       *time.Time `gorm:"column:end" json:"end"`
+	Type      string     `gorm:"default:'auto';column:type" json:"type"`
+}
+
 func apiAllDowntimes(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	vars:=convertToMap(query)
 	downtime,err := downtimes.FindAll(vars)
+	var downtimeWithService []DowntimeService
+	servicesMap := services.All()
+	if downtime==nil{
+		sendJsonAction(downtimeWithService, "fetch", w, r)
+		return
+	}
+	for _,dtime :=range *downtime{
+		var downtimeWithServiceVar DowntimeService
+		downtimeWithServiceVar.Id = dtime.Id
+		downtimeWithServiceVar.ServiceId = dtime.ServiceId
+		downtimeWithServiceVar.SubStatus = dtime.SubStatus
+		downtimeWithServiceVar.Failures = dtime.Failures
+		downtimeWithServiceVar.Start = dtime.Start
+		downtimeWithServiceVar.End = dtime.End
+		downtimeWithServiceVar.Type = dtime.Type
+		downtimeWithServiceVar.Service = servicesMap[dtime.ServiceId]
+		downtimeWithService = append(downtimeWithService,downtimeWithServiceVar)
+	}
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	sendJsonAction(downtime, "fetch", w, r)
+	sendJsonAction(downtimeWithService, "fetch", w, r)
 }
 
 func apiAllDowntimesForServiceHandler(w http.ResponseWriter, r *http.Request) {
