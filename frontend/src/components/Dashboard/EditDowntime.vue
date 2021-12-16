@@ -18,7 +18,10 @@
       </div>
     </div>
 
-    <FormDowntime />
+    <FormDowntime
+      v-else
+      :edit-downtime="editDowntime"
+    />
   </div>
 </template>
 
@@ -34,9 +37,9 @@ export default {
         FormDowntime
     },
     data: function () {
-        return { isLoading: false, downtime: null };
+        return { isLoading: false, editDowntime: null };
     },
-    created () {
+    mounted () {
         this.getDowntime();
     },
     methods: {
@@ -47,10 +50,10 @@ export default {
             }
 
             this.isLoading = true;
-            const { output } = await Api.getDowntime(id);
+            const { output } = await Api.downtime(id);
             this.isLoading = false;
-
-            this.downtime = output;
+            
+            this.editDowntime = output;
         }
     }
 };

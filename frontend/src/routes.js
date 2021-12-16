@@ -154,6 +154,13 @@ const routes = [
                 title: 'Statping - Create Downtime',
             }
         },{
+            path: 'edit_downtime/:id',
+            component: EditDowntime,
+            meta: {
+                requiresAuth: true,
+                title: 'Statping - Update Downtime',
+            }
+        },{
             path: 'messages',
             component: DashboardMessages,
             meta: {

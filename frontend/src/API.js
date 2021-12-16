@@ -396,6 +396,18 @@ class Api {
     async downtime (id) {
         return axios.get(`api/downtimes/${id}`).then((response) => response.data);
     }
+
+    async downtime_create (data) {
+        return axios.post('/api/downtimes', data).then((response) => response.data);
+    }
+
+    async downtime_update ({ id, data }) {
+        return axios.patch(`/api/downtimes/${id}`, data).then((response) => response.data);
+    }
+
+    async downtime_delete (id) {
+        return axios.delete(`/api/downtimes/${id}`).then((response) => response.data);
+    }
 }
 const api = new Api();
 export default api;

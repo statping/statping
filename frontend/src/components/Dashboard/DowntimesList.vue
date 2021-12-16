@@ -4,7 +4,7 @@
       v-if="downtimes.length === 0"
       class="alert alert-dark d-block mt-3 mb-0"
     >
-      You currently don't have any services!
+      You currently don't have any downtimes for this services!
     </div>
     
     <table
@@ -54,8 +54,7 @@
         >
           <td>
             <span>
-              <!-- {{ serviceById(downtime.service_id).name }} -->
-              {{ downtime.service_id }}
+              {{ downtime.service.name }}
             </span>
           </td>
           <td class="d-none d-md-table-cell">
@@ -93,22 +92,22 @@
                 v-if="$store.state.admin"
                 :disabled="isLoading"
                 class="btn btn-sm btn-outline-secondary"
-                @click.prevent="goto({path: `/dashboard/edit_service/${service.id}`, params: {service: service} })"
+                @click.prevent="goto(`/dashboard/edit_downtime/${downtime.id}`)"
               >
                 <FontAwesomeIcon icon="edit" />
               </button>
               <button
                 v-if="$store.state.admin"
-                :disabled="isLoading"
+                :disabled="downtimeDeleteId === downtime.id && isLoading"
                 class="btn btn-sm btn-danger"
-                @click.prevent="deleteService(service)"
+                @click.prevent="handleDowntimeDelete(downtime)"
               >
                 <FontAwesomeIcon
                   v-if="!isLoading"
                   icon="times"
                 />
                 <FontAwesomeIcon
-                  v-if="isLoading"
+                  v-if="downtimeDeleteId === downtime.id && isLoading"
                   icon="circle-notch"
                   spin
                 />
@@ -123,17 +122,51 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
+import Api from '../../API';
 
 export default {
     name: 'DashboardDowntimeList',
+    props: {
+        getDowntimes: {
+            type: Function,
+            default: function () {}
+        }
+    },
     data: function () {
         return {
             isLoading: false,
+            downtimeDeleteId: null,
         };
     },
     computed: {
         ...mapState([ 'downtimes' ]),
-        ...mapGetters([ 'serviceById' ])
+    },
+    methods: {
+        goto: function (to) {
+            this.$router.push(to);
+        },
+        setIsLoading ({ id, isLoading }) {
+            this.downtimeDeleteId = id;
+            this.isLoading = isLoading;
+        },
+        delete: async function (id) {
+            this.setIsLoading({ id, isLoading: true });
+            await Api.downtime_delete(id);
+            this.setIsLoading({ id: null, isLoading: false });
+
+            this.getDowntimes();
+        },
+        handleDowntimeDelete: async function (downtime) {
+            const modal = {
+                visible: true,
+                title: 'Delete Service',
+                body: `Are you sure you want to delete the downtime for service ${downtime.service.name}?`,
+                btnColor: 'btn-danger',
+                btnText: 'Delete Service',
+                func: () => this.delete(downtime.id),
+            };
+            this.$store.commit('setModal', modal);
+        }
     }
 };
 </script>

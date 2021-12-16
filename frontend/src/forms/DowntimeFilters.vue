@@ -29,7 +29,7 @@
           </div>
           <div class="form-group col-md-4">
             <label class="col-form-label">
-              Downtime Date Range
+              {{ $t('downtime_date_range') }}
             </label>
             <div class="form-row">
               <div class="col-sm-6">
@@ -41,7 +41,7 @@
                   class="form-control form-control-plaintext"
                   value=""
                   :config="config"
-                  placeholder="Select Date"
+                  placeholder="Select Start Date"
                 />
               </div>
               <div class="col-sm-6">
@@ -53,7 +53,7 @@
                   class="form-control form-control-plaintext"
                   value=""
                   :config="config"
-                  placeholder="Select Date"
+                  placeholder="Select End Date"
                 />
               </div>
             </div>
@@ -136,7 +136,6 @@ export default {
             config: {
                 altFormat: 'D, J M Y',
                 altInput: true,
-                allowInput: true,
                 dateFormat: 'Z',
                 maxDate: new Date()
             },

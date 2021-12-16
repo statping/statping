@@ -36,7 +36,7 @@
           </div>
         </div>
         <div v-else>
-          <DowntimesList />
+          <DowntimesList :get-downtimes="getDowntimes" />
           <Pagination
             v-if="downtimes.length !== 0"
             :get-next-downtimes="getNextDowntimes"
@@ -85,7 +85,7 @@ export default {
         this.getDowntimes(this.params);
     },
     methods: {
-        getDowntimes: async function (params) {
+        getDowntimes: async function (params = this.params) {
             this.isLoading = true;
             await this.$store.dispatch({ type: 'getDowntimes', payload: params });
             this.isLoading = false;
