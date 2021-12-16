@@ -10,6 +10,7 @@ import (
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/http"
+	"net/url"
 	"sort"
 	"time"
 )
@@ -513,7 +514,20 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonAction(service, "delete", w, r)
 }
 
+func convertToMap(query url.Values) map[string]string{
+	vars := make(map[string]string)
+	if query.Get("time") != "" {
+		vars["time"] = query.Get("time")
+	}
+	return vars
+}
+
 func apiAllServicesHandler(r *http.Request) interface{} {
+	query := r.URL.Query()
+	timeVar := time.Now().Unix()
+	if query.Get("time") != ""{
+		timeVar =
+	}
 	var srvs []services.Service
 	for _, v := range services.AllInOrder() {
 		if !v.Public.Bool && !IsUser(r) {
