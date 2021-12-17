@@ -7,6 +7,7 @@
 
 <script>
   const Footer = () => import(/* webpackChunkName: "index" */ "./components/Index/Footer");
+
   export default {
     name: 'app',
     components: {
@@ -25,8 +26,10 @@
     },
     async beforeMount() {
       await this.$store.dispatch('loadCore')
+
       this.$i18n.locale = this.core.language || "en";
       // this.$i18n.locale = "ru";
+
       if (!this.core.setup) {
         this.$router.push('/setup')
       }
