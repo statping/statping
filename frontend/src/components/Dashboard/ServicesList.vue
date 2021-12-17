@@ -75,6 +75,7 @@ import ServiceSparkList from "@/components/Service/ServiceSparkList";
 import Modal from "@/components/Elements/Modal";
 const draggable = () => import(/* webpackChunkName: "dashboard" */ 'vuedraggable')
 const ToggleSwitch = () => import(/* webpackChunkName: "dashboard" */ '../../forms/ToggleSwitch');
+
 export default {
       name: 'ServicesList',
     components: {
