@@ -16,6 +16,9 @@ const Checkins = () => import(/* webpackChunkName: "dashboard" */ '@/components/
 const Failures = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Failures')
 const NotFound = () => import(/* webpackChunkName: "index" */ '@/pages/NotFound')
 const Importer = () => import(/* webpackChunkName: "index" */ '@/components/Dashboard/Importer')
+const DashboardDowntimes = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/DashboardDowntimes')
+const EditDowntime = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/EditDowntime')
+
 
 import VueRouter from "vue-router";
 import Api from "./API";
