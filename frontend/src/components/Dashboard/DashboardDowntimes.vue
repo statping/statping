@@ -65,6 +65,10 @@ export const initialParams = {
     subStatus: ''
 };
 
+const convertToSec = (val) => {
+    return +new Date(val)/1000
+}
+
 export default {
     name: 'DashboardDowntimes',
     components: {
@@ -79,15 +83,26 @@ export default {
         };
     },
     computed: {
-        ...mapState([ 'downtimes' ])
+        ...mapState([ 'downtimes' ]),
     },
     async mounted () {
         this.getDowntimes(this.params);
     },
     methods: {
         getDowntimes: async function (params = this.params) {
+            const {start, end} = params; 
+
+            let startSec = "", endSec = "";
+
+            if(start) {
+              startSec = convertToSec(start);
+            }
+            if(end) {
+              endSec = convertToSec(end);
+            }
+
             this.isLoading = true;
-            await this.$store.dispatch({ type: 'getDowntimes', payload: params });
+            await this.$store.dispatch({ type: 'getDowntimes', payload: { ...params, start: startSec, end: endSec } });
             this.isLoading = false;
         },
         getNextDowntimes: function () {
@@ -103,7 +118,8 @@ export default {
         },
         handleFilterSearch: function () {
             this.params = { ...this.params, skip: 0 };
-            this.getDowntimes(this.params);
+
+            this.getDowntimes();
         }
     }
 };

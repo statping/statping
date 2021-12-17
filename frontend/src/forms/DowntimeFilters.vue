@@ -142,7 +142,7 @@ export default {
         };
     },
     computed: {
-        ...mapState([ 'services' ]) 
+        ...mapState([ 'services' ])
     },
 };
 </script>
