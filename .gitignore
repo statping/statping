@@ -42,4 +42,4 @@ tmp
 services.yml
 statping.wiki
 assets/
-.vscode
+.vscode/settings.json
