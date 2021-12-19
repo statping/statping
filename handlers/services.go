@@ -8,10 +8,12 @@ import (
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/types/downtimes"
 	"github.com/statping/statping/utils"
 	"net/http"
 	"net/url"
 	"sort"
+	"strconv"
 	"time"
 )
 
@@ -39,6 +41,38 @@ func findService(r *http.Request) (*services.Service, error) {
 	}
 	return servicer, nil
 }
+
+func ConvertToUnixTime(str string) (time.Time,error){
+	i, err := strconv.ParseInt(str, 10, 64)
+	var t time.Time
+	if err != nil {
+		return t,err
+	}
+	tm := time.Unix(i, 0)
+	return tm,nil
+}
+
+func findServiceStatus(t string,s services.Service) string{
+	var timeVar time.Time
+	if t == ""{
+		timeVar = time.Now()
+	}else{
+		var err error
+		timeVar,err = ConvertToUnixTime(t)
+		if err != nil{
+			return ""
+		}
+	}
+	var downtimes []Downtime
+	start := time.Time{}
+	end := timeVar
+	q := db.Where("start BETWEEN ? AND ?", start, end)
+
+
+
+	return ""
+}
+
 
 func findPublicSubService(r *http.Request, service *services.Service) (*services.Service, error) {
 	vars := mux.Vars(r)
@@ -522,17 +556,21 @@ func convertToMap(query url.Values) map[string]string{
 	return vars
 }
 
+
+
 func apiAllServicesHandler(r *http.Request) interface{} {
 	query := r.URL.Query()
-	timeVar := time.Now().Unix()
+	var t string
 	if query.Get("time") != ""{
-		timeVar =
+		t = query.Get("time")
 	}
+
 	var srvs []services.Service
 	for _, v := range services.AllInOrder() {
 		if !v.Public.Bool && !IsUser(r) {
 			continue
 		}
+		serviceStatus :=findServiceStatus(t,v)
 		srvs = append(srvs, v)
 	}
 	return srvs

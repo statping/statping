@@ -58,6 +58,13 @@ func FindByService(service int64, start time.Time, end time.Time) (*[]Downtime, 
 	return &downtime, q.Error()
 }
 
+func FindAllByService(service int64) (*[]Downtime, error) {
+	var downtime []Downtime
+	q := db.Where("service = ? ", service)
+	q = q.Order("id ASC ").Find(&downtime)
+	return &downtime, q.Error()
+}
+
 func (c *Downtime) Create() error {
 	q := db.Create(c)
 	return q.Error()
