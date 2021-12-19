@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/downtimes"
 	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
@@ -11,6 +12,7 @@ import (
 	"github.com/statping/statping/utils"
 	"net/http"
 	"sort"
+	"strconv"
 	"time"
 )
 
@@ -38,6 +40,32 @@ func findService(r *http.Request) (*services.Service, error) {
 	}
 	return servicer, nil
 }
+
+func ConvertToUnixTime(str string) (time.Time,error){
+	i, err := strconv.ParseInt(str, 10, 64)
+	var t time.Time
+	if err != nil {
+		return t,err
+	}
+	tm := time.Unix(i, 0)
+	return tm,nil
+}
+
+func findServiceStatus(t string,s services.Service) string{
+	var timeVar time.Time
+	if t == ""{
+		timeVar = time.Now()
+	}else{
+		var e error
+		timeVar,e = ConvertToUnixTime(t)
+		if e != nil{
+			return ""
+		}
+	}
+	serviceStatus := downtimes.FindStatusByTime(s.Id,timeVar)
+	return serviceStatus
+}
+
 
 func findPublicSubService(r *http.Request, service *services.Service) (*services.Service, error) {
 	vars := mux.Vars(r)
@@ -514,11 +542,18 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllServicesHandler(r *http.Request) interface{} {
+	query := r.URL.Query()
+	var t string
+	if query.Get("time") != ""{
+		t = query.Get("time")
+	}
 	var srvs []services.Service
 	for _, v := range services.AllInOrder() {
 		if !v.Public.Bool && !IsUser(r) {
 			continue
 		}
+		serviceStatus :=findServiceStatus(t,v)// we get status of each service at time t
+		fmt.Println(serviceStatus)
 		srvs = append(srvs, v)
 	}
 	return srvs
