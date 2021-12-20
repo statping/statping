@@ -104,7 +104,7 @@
               >
                 <FontAwesomeIcon
                   v-if="!isLoading"
-                  icon="times"
+                  icon="trash"
                 />
                 <FontAwesomeIcon
                   v-if="downtimeDeleteId === downtime.id && isLoading"
