@@ -67,8 +67,27 @@ export const initialParams = {
     subStatus: ''
 };
 
-const convertToSec = (val) => {
+export const convertToSec = (val) => {
     return +new Date(val)/1000;
+};
+
+export const checkErrors = (params) => {
+    const { start, end } = params;
+    const errors = {};
+  
+    // Converting into millisec
+    const startSec = convertToSec(start);
+    const endSec = convertToSec(end) + (60 * 60 * 23 + 59 * 60 + 59);
+  
+    if (!start && end) {
+        errors.start = 'Need to enter Start Date';
+    } else if (start && !end) {
+        errors.end = 'Need to enter End Date';
+    } else if ( startSec > endSec ) {
+        errors.end = 'End Date should be greater than Start Date';
+    }
+  
+    return errors;
 };
 
 export default {
@@ -91,7 +110,7 @@ export default {
     created: function () {
         // Set start date
         const startDate = new Date();
-        startDate.setDate(-10);
+        startDate.setDate(startDate.getDate() - 30);
         startDate.setHours(0,0,0,0);
         this.params.start = startDate.toJSON();
 
@@ -106,9 +125,10 @@ export default {
         getDowntimes: async function (params = this.params) {
             const { start, end } = params;
 
-            this.checkFilterErrors();
+            const errors = checkErrors(this.params);
 
-            if (Object.keys(this.filterErrors).length > 0) {
+            if (Object.keys(errors).length > 0) {
+                this.filterErrors = Object.assign({}, errors);
                 return;
             }
 
@@ -141,24 +161,6 @@ export default {
             this.params = { ...this.params, skip: 0 };
 
             this.getDowntimes();
-        },
-        checkFilterErrors: function () {
-            const { start, end } = this.params;
-            const errors = {};
-
-            // Converting into millisec
-            const startSec = convertToSec(start);
-            const endSec = convertToSec(end) + (60 * 60 * 23 + 59 * 60 + 59);
-
-            if (!start && end) {
-                errors.start = 'Need to enter Start Date';
-            } else if (start && !end) {
-                errors.end = 'Need to enter End Date';
-            } else if ( startSec > endSec ) {
-                errors.end = 'End Date should be greater than Start Date';
-            }
-
-            this.filterErrors = Object.assign({}, errors);
         },
         handleFilterChange: function (e) {
             const { name } = e.target;

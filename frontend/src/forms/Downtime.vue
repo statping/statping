@@ -90,6 +90,12 @@
                   :config="config"
                   placeholder="Select Start Date"
                 />
+                <small
+                  v-if="errors.start"
+                  class="form-text text-danger"
+                >
+                  {{ errors.start }}
+                </small>
               </div>
               <div class="col-sm-6">
                 <FlatPickr
@@ -102,6 +108,12 @@
                   :config="config"
                   placeholder="Select End Date"
                 />
+                <small
+                  v-if="errors.end"
+                  class="form-text text-danger"
+                >
+                  {{ errors.end }}
+                </small>
               </div>
             </div>
             <small
@@ -128,6 +140,7 @@
               required
             >
             <small
+              v-if="errors.failures"
               class="form-text text-danger"
             >
               {{ errors.failures }}
@@ -144,7 +157,7 @@
           <div class="col-12">
             <button
               :disabled="isLoading || !isCreateDowntimeBtnEnabled()"
-              type="submit"
+              type="button"
               class="btn btn-success btn-block"
               @click.prevent="saveDowntime"
             >
@@ -162,6 +175,29 @@ import { mapState } from 'vuex';
 import Api from '../API';
 import FlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
+import { convertToSec } from '../components/Dashboard/DashboardDowntimes.vue';
+
+const checkFormErrors = (value) => {
+    const { failures, start, end } = value;
+    const errors = {};
+    
+    // Converting into millisec
+    const startSec = convertToSec(start);
+    const endSec = convertToSec(end);
+
+    // Check for valid positive numbers
+    if (!(/^\d+$/.test(failures))) {
+        errors.failures = 'Enter Valid Positve Number without decimal point';
+    } else if (!start && end) {
+        errors.start = 'Need to enter Start Date';
+    } else if (start && !end) {
+        errors.end = 'Need to enter End Date';
+    } else if ( startSec > endSec ) {
+        errors.end = 'End Date should be greater than Start Date';
+    }
+
+    return errors;
+};
 
 export default {
     name: 'FormDowntime',
@@ -182,11 +218,11 @@ export default {
                 serviceId: '',
                 subStatus: 'degraded',
                 failures: 20,
-                start: new Date(),
-                end: new Date(),
+                start: new Date().toJSON(),
+                end: new Date().toJSON(),
             },
             config: {
-                altFormat: 'D, J M Y, \\at h:iK',
+                altFormat: 'J M, Y, h:iK',
                 altInput: true,
                 enableTime: true,
                 dateFormat: 'Z',
@@ -225,19 +261,9 @@ export default {
 
             return serviceId && subStatus && failures && start && end;
         },
-        checkFormErrors: function (value) {
-            const errors = {};
-
-            // Check for valid positive numbers
-            if (!(/^\d+$/.test(value.failures))) {
-                errors.failures = 'Enter Valid Positve Number without decimal point';
-            }
-
-            return errors;
-        },
         saveDowntime: async function () {
-            const errors = this.checkFormErrors(this.downtime);
             const id = this.$route.params.id;
+            const errors = checkFormErrors(this.downtime);
             
             // Check of invalid input.
             if (Object.keys(errors).length > 0) {

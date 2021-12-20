@@ -42,7 +42,7 @@
                   value=""
                   :config="config"
                   placeholder="Select Start Date"
-                  @on-change="handleFilterChange({target: {name: 'start'}})"
+                  @on-change="() => handleFilterChange({target: {name: 'start'}})"
                 />
                 <small
                   v-if="filterErrors.start"
@@ -59,9 +59,9 @@
                   name="end"
                   class="form-control form-control-plaintext"
                   value=""
-                  :config="{...config, ...endConfig}"
+                  :config="config"
                   placeholder="Select End Date"
-                  @on-change="handleFilterChange({target: {name: 'end'}})"
+                  @on-change="() => handleFilterChange({target: {name: 'end'}})"
                 />
                 <small
                   v-if="filterErrors.end"
@@ -159,17 +159,14 @@ export default {
     data: function () {
         return {
             config: {
-                altFormat: 'D, J M Y',
+                altFormat: 'J M, Y',
                 altInput: true,
                 dateFormat: 'Z',
             },
         };
     },
     computed: {
-        ...mapState([ 'services' ]),
-        endConfig: function (){
-            return { minDate: this.params.start ? this.params.start : null };
-        }
+        ...mapState([ 'services' ])
     },
 };
 </script>
