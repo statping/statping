@@ -101,8 +101,15 @@ export default {
                 return;
             }
 
-            const startSec = convertToSec(start);
-            const endSec = convertToSec(end) + (60 * 60 * 23 + 59 * 60 + 59); // adding end of time for that particular date.
+            let startSec = ''; let endSec = '';
+
+            if (start) {
+                startSec = convertToSec(start);
+            }
+
+            if (end) {
+                endSec = convertToSec(end) + (60 * 60 * 23 + 59 * 60 + 59); // adding end of time for that particular date.
+            }
         
 
             this.isLoading = true;
@@ -110,11 +117,11 @@ export default {
             this.isLoading = false;
         },
         getNextDowntimes: function () {
-            this.params = { ...this.params, skip: this.params.skip + 1 };
-            this.getDowntimes(this.params);
+            this.params = { ...this.params, skip: this.params.skip + this.params.count };
+            this.getDowntimes();
         },
         getPrevDowntimes: function () {
-            this.params = { ...this.params, skip: this.params.skip - 1 };
+            this.params = { ...this.params, skip: this.params.skip - this.params.count };
             this.getDowntimes(this.params);
         },
         handleClearFilters: function () {
