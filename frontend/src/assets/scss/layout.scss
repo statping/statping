@@ -85,6 +85,11 @@ A {
 
 .nav-link {
   color: $navbar-color;
+
+  &.router-link-exact-active {
+    font-weight: bold;
+    // text-decoration: underline;
+  }
 }
 
 .form-control {
