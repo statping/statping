@@ -88,7 +88,18 @@ export default {
     computed: {
         ...mapState([ 'downtimes' ]),
     },
-    async mounted () {
+    created: function () {
+        // Set start date
+        const startDate = new Date();
+        startDate.setDate(-10);
+        startDate.setHours(0,0,0,0);
+        this.params.start = startDate.toJSON();
+
+        // Set end date
+        const endDate = new Date();
+        endDate.setHours(0,0,0,0);
+        this.params.end = endDate.toJSON();
+
         this.getDowntimes(this.params);
     },
     methods: {
@@ -151,9 +162,9 @@ export default {
             this.filterErrors = Object.assign({}, errors);
         },
         handleFilterChange: function (e) {
-            // reset all the errors
             const { name } = e.target;
 
+            // reset error according to edit input
             delete this.filterErrors[name];
         }
     }
