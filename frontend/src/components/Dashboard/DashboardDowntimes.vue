@@ -121,7 +121,6 @@ export default {
             if (end) {
                 endSec = convertToSec(end) + (60 * 60 * 23 + 59 * 60 + 59); // adding end of time for that particular date.
             }
-        
 
             this.isLoading = true;
             await this.$store.dispatch({ type: 'getDowntimes', payload: { ...params, start: startSec, end: endSec } });

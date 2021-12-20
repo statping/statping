@@ -1,8 +1,14 @@
 <template>
   <form>
     <div class="card contain-card mb-4">
-      <div class="card-header">
-        {{ $t("downtime_info") }}
+      <div class="card-header d-flex align-items-center">
+        <button
+          class="btn p-0 mr-2"
+          @click="$router.push('/dashboard/downtimes');"
+        >
+          <FontAwesomeIcon icon="arrow-circle-left" />
+        </button>
+        <div>{{ $t("downtime_info") }}</div>
       </div>
       <div class="card-body">
         <div class="form-group row">
