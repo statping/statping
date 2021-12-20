@@ -159,10 +159,10 @@ export default {
         handleDowntimeDelete: async function (downtime) {
             const modal = {
                 visible: true,
-                title: 'Delete Service',
+                title: 'Delete Downtime',
                 body: `Are you sure you want to delete the downtime for service ${downtime.service.name}?`,
                 btnColor: 'btn-danger',
-                btnText: 'Delete Service',
+                btnText: 'Delete Downtime',
                 func: () => this.delete(downtime.id),
             };
             this.$store.commit('setModal', modal);
