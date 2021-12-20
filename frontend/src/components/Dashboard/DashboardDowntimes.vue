@@ -4,6 +4,8 @@
       :handle-clear-filters="handleClearFilters"
       :params="params"
       :handle-filter-search="handleFilterSearch"
+      :filter-errors="filterErrors"
+      :handle-filter-change="handleFilterChange"
     />
     
     <div class="card contain-card mb-4">
@@ -66,8 +68,8 @@ export const initialParams = {
 };
 
 const convertToSec = (val) => {
-    return +new Date(val)/1000
-}
+    return +new Date(val)/1000;
+};
 
 export default {
     name: 'DashboardDowntimes',
@@ -79,7 +81,8 @@ export default {
     data: function () {
         return {
             isLoading: false,
-            params: { ...initialParams }
+            params: { ...initialParams },
+            filterErrors: {}
         };
     },
     computed: {
@@ -90,16 +93,17 @@ export default {
     },
     methods: {
         getDowntimes: async function (params = this.params) {
-            const {start, end} = params; 
+            const { start, end } = params;
 
-            let startSec = "", endSec = "";
+            this.checkFilterErrors();
 
-            if(start) {
-              startSec = convertToSec(start);
+            if (Object.keys(this.filterErrors).length > 0) {
+                return;
             }
-            if(end) {
-              endSec = convertToSec(end);
-            }
+
+            const startSec = convertToSec(start);
+            const endSec = convertToSec(end) + (60 * 60 * 23 + 59 * 60 + 59); // adding end of time for that particular date.
+        
 
             this.isLoading = true;
             await this.$store.dispatch({ type: 'getDowntimes', payload: { ...params, start: startSec, end: endSec } });
@@ -120,6 +124,30 @@ export default {
             this.params = { ...this.params, skip: 0 };
 
             this.getDowntimes();
+        },
+        checkFilterErrors: function () {
+            const { start, end } = this.params;
+            const errors = {};
+
+            // Converting into millisec
+            const startSec = convertToSec(start);
+            const endSec = convertToSec(end) + (60 * 60 * 23 + 59 * 60 + 59);
+
+            if (!start && end) {
+                errors.start = 'Need to enter Start Date';
+            } else if (start && !end) {
+                errors.end = 'Need to enter End Date';
+            } else if ( startSec > endSec ) {
+                errors.end = 'End Date should be greater than Start Date';
+            }
+
+            this.filterErrors = Object.assign({}, errors);
+        },
+        handleFilterChange: function (e) {
+            // reset all the errors
+            const { name } = e.target;
+
+            delete this.filterErrors[name];
         }
     }
 };

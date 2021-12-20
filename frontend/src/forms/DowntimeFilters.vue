@@ -6,7 +6,7 @@
     <div class="card-body">
       <form>
         <div class="form-row">
-          <div class="form-group col-md-3">
+          <div class="form-group col-md-2">
             <label class="col-form-label">
               {{ $t('service') }}
             </label>
@@ -27,7 +27,7 @@
               </option>
             </select>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-5">
             <label class="col-form-label">
               {{ $t('downtime_date_range') }}
             </label>
@@ -42,7 +42,14 @@
                   value=""
                   :config="config"
                   placeholder="Select Start Date"
+                  @on-change="handleFilterChange({target: {name: 'start'}})"
                 />
+                <small
+                  v-if="filterErrors.start"
+                  class="form-text text-danger"
+                >
+                  {{ filterErrors.start }}
+                </small>
               </div>
               <div class="col-sm-6">
                 <FlatPickr
@@ -52,9 +59,16 @@
                   name="end"
                   class="form-control form-control-plaintext"
                   value=""
-                  :config="config"
+                  :config="{...config, ...endConfig}"
                   placeholder="Select End Date"
+                  @on-change="handleFilterChange({target: {name: 'end'}})"
                 />
+                <small
+                  v-if="filterErrors.end"
+                  class="form-text text-danger"
+                >
+                  {{ filterErrors.end }}
+                </small>
               </div>
             </div>
           </div>
@@ -79,9 +93,12 @@
             </select>
           </div>
 
-          <div class="form-group col-md-3 d-flex align-items-end">
+          <div class="form-group col-md-3">
+            <label class="col-form-label invisible">
+              {{ $t('actions') }}
+            </label>
             <div
-              class="ml-auto"
+              class="d-flex justify-content-end"
               role="group"
             >
               <button
@@ -129,6 +146,14 @@ export default {
         handleFilterSearch: {
             type: Function,
             default: function () {}
+        },
+        filterErrors: {
+            type: Object,
+            default: null
+        },
+        handleFilterChange: {
+            type: Function,
+            default: function () {}
         }
     },
     data: function () {
@@ -137,12 +162,14 @@ export default {
                 altFormat: 'D, J M Y',
                 altInput: true,
                 dateFormat: 'Z',
-                maxDate: new Date()
             },
         };
     },
     computed: {
-        ...mapState([ 'services' ])
+        ...mapState([ 'services' ]),
+        endConfig: function (){
+            return { ...(this.params.start && { minDate: this.params.start }) };
+        }
     },
 };
 </script>

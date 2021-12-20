@@ -201,17 +201,17 @@ export default {
         }),
     },
     mounted: function () {
-      if(this.editDowntime) {
-        const { service_id, sub_status, failures, start, end } = this.editDowntime;
+        if (this.editDowntime) {
+            const { service_id, sub_status, failures, start, end } = this.editDowntime;
   
-        this.downtime = {
-            start,
-            end,
-            failures,
-            serviceId: service_id,
-            subStatus: sub_status
-        };
-      }      
+            this.downtime = {
+                start,
+                end,
+                failures,
+                serviceId: service_id,
+                subStatus: sub_status
+            };
+        }      
     }, 
     methods: {
         isCreateDowntimeBtnEnabled: function () {
