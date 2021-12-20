@@ -102,7 +102,7 @@
               role="group"
             >
               <button
-                type="submit"
+                type="button"
                 class="btn btn-primary mr-1"
                 @click.prevent="handleFilterSearch"
               >
@@ -168,7 +168,7 @@ export default {
     computed: {
         ...mapState([ 'services' ]),
         endConfig: function (){
-            return { ...(this.params.start && { minDate: this.params.start }) };
+            return { minDate: this.params.start ? this.params.start : null };
         }
     },
 };
