@@ -116,7 +116,7 @@ func FindAll(vars map[string]string ) (*[]Downtime, error) {
 	}else {
 		skip = 0
 	}
-	q = q.Order("id DESC")
+	q = q.Order("start DESC")
 	q = q.Limit((int)(count)).Offset((int)(skip)).Find(&downtime)
 	return &downtime, q.Error()
 }
