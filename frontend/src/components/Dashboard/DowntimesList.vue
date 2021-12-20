@@ -121,7 +121,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
 import Api from '../../API';
 
 export default {

@@ -258,7 +258,7 @@ export default Vue.mixin({
       return addSeconds(date, amount)
     },
     niceDateWithYear (val) {
-      return format(parseISO(val), 'EEE, do MMM yyyy \'at\' h:mma');
+      return format(parseISO(val), 'do MMM, yyyy h:mma');
     },
   }
 });
