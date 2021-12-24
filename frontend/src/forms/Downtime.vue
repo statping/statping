@@ -271,10 +271,10 @@ export default {
                 return;
             }
 
-            const { serviceId, subStatus } = this.downtime;
+            const { serviceId, subStatus, ...rest } = this.downtime;
 
             const downtime = {
-                ...this.downtime,
+                ...rest,
                 ...(!id && { 'service_id': serviceId }),
                 'sub_status': subStatus,
             };
