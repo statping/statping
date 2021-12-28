@@ -68,7 +68,7 @@
             <span
               class=""
             >
-              {{ niceDateWithYear(downtime.end) }}
+              {{ downtime.end ? niceDateWithYear(downtime.end) : 'Ongoing' }}
             </span>
           </td>
           <td class="d-none d-md-table-cell">

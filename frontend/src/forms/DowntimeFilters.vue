@@ -16,7 +16,7 @@
               class="form-control"
             >
               <option value="">
-                Select Service
+                All
               </option>
               <option
                 v-for="service in services"
@@ -82,7 +82,7 @@
               class="form-control"
             >
               <option value="">
-                Select Status
+                All
               </option>
               <option value="degraded">
                 Degraded
@@ -162,6 +162,7 @@ export default {
                 altFormat: 'J M, Y',
                 altInput: true,
                 dateFormat: 'Z',
+                maxDate: new Date().toJSON(),
             },
         };
     },

@@ -88,6 +88,7 @@
                   class="form-control form-control-plaintext"
                   :config="config"
                   placeholder="Select Start Date"
+                  @on-change="() => handleFormChange({target: {name: 'start'}})"
                 />
                 <small
                   v-if="errors.start"
@@ -105,7 +106,7 @@
                   class="form-control form-control-plaintext"
                   :config="config"
                   placeholder="Select End Date"
-                  @on-change="handleDateChange"
+                  @on-change="() => handleFormChange({target: {name: 'end'}})"
                 />
                 <small
                   v-if="errors.end"
@@ -176,26 +177,44 @@ import FlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
 import { convertToSec } from '../components/Dashboard/DashboardDowntimes.vue';
 
-const checkFormErrors = (value) => {
+const checkFormErrors = (value, id) => {
     const { failures, start, end } = value;
     const errors = {};
+    let endSec = ''; let startSec = '';
     
     // Converting into millisec
-    const startSec = convertToSec(start);
-    const endSec = convertToSec(end);
+    if (start) {
+        startSec = convertToSec(start);
+    }
+
+    if (end) {
+        endSec = convertToSec(end);
+    }
 
     // Check for valid positive numbers
     if (!(/^\d+$/.test(failures))) {
         errors.failures = 'Enter Valid Positve Number without decimal point';
     } else if (!start && end) {
         errors.start = 'Need to enter Start Date';
-    } else if (start && !end) {
+    } else if ( id && startSec && !endSec ) {
         errors.end = 'Need to enter End Date';
-    } else if ( startSec > endSec ) {
+    } else if ( endSec && startSec > endSec ) {
         errors.end = 'End Date should be greater than Start Date';
-    }
+    } 
 
     return errors;
+};
+
+export const removeEmptyParams = (obj) => {
+    const updatedObj = {};
+
+    for (const [ key , value ] of Object.entries(obj)) {
+        if (value) {
+            updatedObj[key] = value;
+        }
+    }
+
+    return updatedObj;
 };
 
 export default {
@@ -225,6 +244,7 @@ export default {
                 altInput: true,
                 enableTime: true,
                 dateFormat: 'Z',
+                maxDate: new Date().toJSON(),
             },
         };
     },
@@ -255,19 +275,15 @@ export default {
         }      
     },
     methods: {
-        handleDateChange: function (selectedDates, dateStr, instance) {
-            if (!dateStr) {
-                instance.close();
-            }
-        },
         isCreateDowntimeBtnEnabled: function () {
-            const { serviceId, subStatus, failures, start } = this.downtime;
+            const { id } = this.$route.params;
+            const { serviceId, subStatus, failures, start, end } = this.downtime;
 
-            return serviceId && subStatus && failures && start;
+            return serviceId && subStatus && failures && start && (id ? end : true);
         },
         saveDowntime: async function () {
-            const id = this.$route.params.id;
-            const errors = checkFormErrors(this.downtime);
+            const { id } = this.$route.params;
+            const errors = checkFormErrors(this.downtime, id);
             
             // Check of invalid input.
             if (Object.keys(errors).length > 0) {
@@ -275,7 +291,7 @@ export default {
                 return;
             }
 
-            const { serviceId, subStatus, ...rest } = this.downtime;
+            const { serviceId, subStatus, ...rest } = removeEmptyParams(this.downtime);
 
             const downtime = {
                 ...rest,
@@ -292,6 +308,11 @@ export default {
             this.isLoading=false;
 
             this.$router.push('/dashboard/downtimes');
+        },
+        handleFormChange: function (e) {
+            const { name } = e.target;
+
+            delete this.errors[name];
         }
     }
 };
