@@ -131,6 +131,7 @@ func Router() *mux.Router {
 
 	// API SERVICE Routes
 	api.Handle("/api/services", scoped(apiAllServicesHandler)).Methods("GET")
+	api.Handle("/api/services/status", scoped(apiAllServicesStatusHandler)).Methods("GET")
 	api.Handle("/api/services", authenticated(apiCreateServiceHandler, false)).Methods("POST")
 	api.Handle("/api/services/{id}", authenticatedV2(apiServiceHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/sub_services", scoped(apiAllSubServicesHandler)).Methods("GET")
