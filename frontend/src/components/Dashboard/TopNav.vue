@@ -14,6 +14,9 @@
                 <li @click="navopen = !navopen" class="nav-item navbar-item">
                     <router-link to="/dashboard/services" class="nav-link">{{ $t('services') }}</router-link>
                 </li>
+                <li @click="navopen = !navopen" class="nav-item navbar-item">
+                    <router-link to="/dashboard/downtimes" class="nav-link">{{'Downtimes'}}</router-link>
+                </li>
                 <li v-if="admin" @click="navopen = !navopen" class="nav-item navbar-item">
                     <router-link to="/dashboard/users" class="nav-link">{{ $t('users') }}</router-link>
                 </li>

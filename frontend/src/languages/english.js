@@ -140,6 +140,20 @@ const english = {
   notify_all: "Notify All Changes",
   service_update: "Update Service",
   service_create: "Create Service",
+  start_time: 'Start Time',	
+  end_time: "End Time",	
+  actions: "Actions",	
+  services: "Services",	
+  downtimes: "Downtimes",	
+  downtime_info: "Downtime Info",	
+  downtime_status: "Downtime Status",	
+  downtime_date_range: "Downtime Date Range",	
+  downtime_create: "Create Downtime",	
+  downtime_update: "Update Downtime",	
+  filters: "Filters",	
+  service: "Service",	
+  clear: "Clear",	
+  search: "Search",
 };
 
 export default english;

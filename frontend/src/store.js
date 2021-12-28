@@ -23,6 +23,7 @@ export default new Vuex.Store({
     oauth: {},
     token: null,
     services: [],
+    downtimes: [],
     service: null,
     groups: [],
     messages: [],
@@ -152,11 +153,18 @@ export default new Vuex.Store({
     setModal(state, modal) {
       state.modal = modal
     },
+    setDowntimes (state, downtimes) {
+      state.downtimes = downtimes;
+    }
   },
   actions: {
     async getAllServices(context) {
       const services = await Api.services()
       context.commit("setServices", services);
+    },
+    async getDowntimes (context, { payload }) {
+      const { output } = await Api.downtimes(payload);
+      context.commit('setDowntimes', output ?? []);
     },
     async loadCore(context) {
       const core = await Api.core()

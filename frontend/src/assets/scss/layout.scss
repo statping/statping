@@ -85,6 +85,10 @@ A {
 
 .nav-link {
   color: $navbar-color;
+
+  &.router-link-exact-active {
+    font-weight: bold;
+  }
 }
 
 .form-control {
