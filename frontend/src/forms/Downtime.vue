@@ -218,7 +218,7 @@ export default {
                 subStatus: 'degraded',
                 failures: 20,
                 start: new Date().toJSON(),
-                end: new Date().toJSON(),
+                end: null,
             },
             config: {
                 altFormat: 'J M, Y, h:iK',
