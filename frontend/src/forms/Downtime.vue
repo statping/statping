@@ -300,12 +300,18 @@ export default {
             };
 
             this.isLoading=true;
-            if (id) {
-                await Api.downtime_update({ id, data: downtime });
-            } else {
-                await Api.downtime_create(downtime);
+
+            try {
+                if (id) {
+                    await Api.downtime_update({ id, data: downtime });
+                } else {
+                    await Api.downtime_create(downtime);
+                }
+                this.isLoading=false;
+            } catch (error) {
+                this.isLoading=false;
+                throw new Error('error.message');
             }
-            this.isLoading=false;
 
             this.$router.push('/dashboard/downtimes');
         },
