@@ -310,7 +310,7 @@ export default {
                 this.isLoading=false;
             } catch (error) {
                 this.isLoading=false;
-                throw new Error('error.message');
+                throw new Error(error.message);
             }
 
             this.$router.push('/dashboard/downtimes');
