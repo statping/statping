@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/statping/statping/database"
@@ -20,6 +21,8 @@ type serviceOrder struct {
 	Id    int64 `json:"service"`
 	Order int   `json:"order"`
 }
+
+
 
 var (
 	zeroTime  time.Time
@@ -51,7 +54,7 @@ func ConvertToUnixTime(str string) (time.Time,error){
 	return tm,nil
 }
 
-func findServiceStatus(t string,s services.Service) string{
+func findDowntimeByTime(t string,s services.Service) *downtimes.Downtime {
 	var timeVar time.Time
 	if t == ""{
 		timeVar = time.Now()
@@ -59,11 +62,11 @@ func findServiceStatus(t string,s services.Service) string{
 		var e error
 		timeVar,e = ConvertToUnixTime(t)
 		if e != nil{
-			return ""
+			return nil
 		}
 	}
-	serviceStatus := downtimes.FindStatusByTime(s.Id,timeVar)
-	return serviceStatus
+	downTime := downtimes.FindDowntime(s.Id,timeVar)
+	return downTime
 }
 
 
@@ -542,19 +545,39 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllServicesHandler(r *http.Request) interface{} {
-	query := r.URL.Query()
-	var t string
-	if query.Get("time") != ""{
-		t = query.Get("time")
-	}
 	var srvs []services.Service
 	for _, v := range services.AllInOrder() {
 		if !v.Public.Bool && !IsUser(r) {
 			continue
 		}
-		serviceStatus :=findServiceStatus(t,v)// we get status of each service at time t
-		fmt.Println(serviceStatus)
 		srvs = append(srvs, v)
+	}
+	return srvs
+}
+
+func apiAllServicesStatusHandler(r *http.Request) interface{} {
+	query := r.URL.Query()
+	var t string
+	if query.Get("time") != ""{
+		t = query.Get("time")
+	}
+	var srvs []services.ServiceWithDowntime
+	for _, v := range services.AllInOrder() {
+		if !v.Public.Bool && !IsUser(r) {
+			continue
+		}
+		dtime :=findDowntimeByTime(t,v)// we get status of each service at time t
+		serviceJson,_ := json.Marshal(&v)
+		var serviceDowntimeMap map[string]interface{}
+		json.Unmarshal(serviceJson,&serviceDowntimeMap)
+
+		jsonString,_ := json.Marshal(serviceDowntimeMap)
+		serviceDowntime := services.ServiceWithDowntime{}
+		json.Unmarshal(jsonString,&serviceDowntime)
+		if dtime!=nil{
+			serviceDowntime.Downtime = *dtime
+		}
+		srvs = append(srvs, serviceDowntime)
 	}
 	return srvs
 }
