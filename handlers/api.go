@@ -167,7 +167,9 @@ func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *ht
 	case *downtimes.Downtime:
 		objName = "downtime"
 		objId = v.Id
-
+	case *DowntimeService:
+		objName = "downtime_with_service"
+		objId = v.Id
 	default:
 		objName = fmt.Sprintf("%T", v)
 	}
