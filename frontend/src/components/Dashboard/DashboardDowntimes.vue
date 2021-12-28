@@ -68,7 +68,7 @@ export const initialParams = {
 };
 
 export const convertToSec = (val) => {
-    return +new Date(val)/1000;
+    return (new Date(val).getTime())/1000;
 };
 
 export const checkErrors = (params) => {
