@@ -57,6 +57,7 @@ import DowntimesList from './DowntimesList.vue';
 import { mapState } from 'vuex';
 import DowntimesFilterForm from '../../forms/DowntimeFilters.vue';
 import Pagination from '../Elements/Pagination.vue';
+import { removeEmptyParams } from '../../forms/Downtime.vue';
 
 export const initialParams = { 
     serviceId: '',
@@ -142,8 +143,10 @@ export default {
                 endSec = convertToSec(end) + (60 * 60 * 23 + 59 * 60 + 59); // adding end of time for that particular date.
             }
 
+            const payload = removeEmptyParams({ ...params, start: startSec, end: endSec });
+            
             this.isLoading = true;
-            await this.$store.dispatch({ type: 'getDowntimes', payload: { ...params, start: startSec, end: endSec } });
+            await this.$store.dispatch({ type: 'getDowntimes', payload });
             this.isLoading = false;
         },
         getNextDowntimes: function () {

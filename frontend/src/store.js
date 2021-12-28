@@ -23,6 +23,7 @@ export default new Vuex.Store({
     oauth: {},
     token: null,
     services: [],
+    downtimes: [],
     service: null,
     groups: [],
     messages: [],
