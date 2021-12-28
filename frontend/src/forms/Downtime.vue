@@ -1,16 +1,16 @@
 <template>
-  <form>
-    <div class="card contain-card mb-4">
-      <div class="card-header d-flex align-items-center">
-        <button
-          class="btn p-0 mr-2"
-          @click="$router.push('/dashboard/downtimes');"
-        >
-          <FontAwesomeIcon icon="arrow-circle-left" />
-        </button>
-        <div>{{ $t("downtime_info") }}</div>
-      </div>
-      <div class="card-body">
+  <div class="card contain-card mb-4">
+    <div class="card-header d-flex align-items-center">
+      <button
+        class="btn p-0 mr-2"
+        @click="$router.push('/dashboard/downtimes');"
+      >
+        <FontAwesomeIcon icon="arrow-circle-left" />
+      </button>
+      <div>{{ $t("downtime_info") }}</div>
+    </div>
+    <div class="card-body">
+      <form>
         <div class="form-group row">
           <label class="col-sm-4 col-form-label">
             {{
@@ -86,7 +86,6 @@
                   type="text"
                   name="start"
                   class="form-control form-control-plaintext"
-                  value=""
                   :config="config"
                   placeholder="Select Start Date"
                 />
@@ -104,9 +103,9 @@
                   type="text"
                   name="end"
                   class="form-control form-control-plaintext"
-                  value=""
                   :config="config"
                   placeholder="Select End Date"
+                  @on-change="handleDateChange"
                 />
                 <small
                   v-if="errors.end"
@@ -165,9 +164,9 @@
             </button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
-  </form>
+  </div>
 </template>
 
 <script>
@@ -254,12 +253,17 @@ export default {
                 subStatus: sub_status
             };
         }      
-    }, 
+    },
     methods: {
+        handleDateChange: function (selectedDates, dateStr, instance) {
+            if (!dateStr) {
+                instance.close();
+            }
+        },
         isCreateDowntimeBtnEnabled: function () {
-            const { serviceId, subStatus, failures, start, end } = this.downtime;
+            const { serviceId, subStatus, failures, start } = this.downtime;
 
-            return serviceId && subStatus && failures && start && end;
+            return serviceId && subStatus && failures && start;
         },
         saveDowntime: async function () {
             const id = this.$route.params.id;
