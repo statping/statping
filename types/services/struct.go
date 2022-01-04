@@ -139,12 +139,13 @@ type ServiceWithDowntime struct {
 	notifyAfterCount int64 `gorm:"column:notify_after_count" yaml:"-"`
 	prevOnline       bool  `gorm:"column:prev_online" yaml:"-"`
 
-	FailureCounter  int    `gorm:"column:failure_counter" json:"-" yaml:"-"`
-	CurrentDowntime int64  `gorm:"column:current_downtime" json:"-" yaml:"-"`
-	LastFailureType string `gorm:"-" json:"-" yaml:"-"`
-	ManualDowntime  bool   `gorm:"default:false;column:manual_downtime" json:"manual_downtime"`
-	Downtime  downtimes.Downtime `gorm:"-" json:"downtime" yaml:"-"`
+	FailureCounter  int                `gorm:"column:failure_counter" json:"-" yaml:"-"`
+	CurrentDowntime int64              `gorm:"column:current_downtime" json:"-" yaml:"-"`
+	LastFailureType string             `gorm:"-" json:"-" yaml:"-"`
+	ManualDowntime  bool               `gorm:"default:false;column:manual_downtime" json:"manual_downtime"`
+	Downtime        downtimes.Downtime `gorm:"-" json:"downtime" yaml:"-"`
 }
+
 // ServiceOrder will reorder the services based on 'order_id' (Order)
 type ServiceOrder []Service
 
