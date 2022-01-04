@@ -99,7 +99,6 @@ func start() {
 	confgs, err = configs.LoadConfigs(configFile)
 	if err != nil {
 		log.Infoln("Starting in Setup Mode")
-		fmt.Println(err)
 		if err = handlers.RunHTTPServer(); err != nil {
 			exit(err)
 		}
