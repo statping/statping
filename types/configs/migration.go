@@ -23,7 +23,6 @@ import (
 )
 
 func (d *DbConfig) ResetCore() error {
-	fmt.Println("1")
 	if d.Db.HasTable("core") {
 		if d.Db.Error() != nil {
 			return errors.New("Unable to connect to database in RestCore")
