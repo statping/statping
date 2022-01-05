@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/statping/statping/database"
@@ -552,7 +551,7 @@ func apiAllServicesHandler(r *http.Request) interface{} {
 	return srvs
 }
 
-func apiAllServicesStatusHandler(r *http.Request) interface{} {
+func apiAllServicesStatusHandler(w http.ResponseWriter, r *http.Request){
 	query := r.URL.Query()
 	var t string
 	if query.Get("time") != "" {
@@ -568,18 +567,14 @@ func apiAllServicesStatusHandler(r *http.Request) interface{} {
 		if !v.Public.Bool && !IsUser(r) {
 			continue
 		}
-		serviceJson, _ := json.Marshal(&v)
-		var serviceDowntimeMap map[string]interface{}
-		json.Unmarshal(serviceJson, &serviceDowntimeMap)
-		jsonString, _ := json.Marshal(serviceDowntimeMap)
-		serviceDowntime := services.ServiceWithDowntime{}
-		json.Unmarshal(jsonString, &serviceDowntime)
+		var serviceDowntimeVar services.ServiceWithDowntime
+		serviceDowntimeVar.Service = v
 		if vv, ok := m[v.Id]; ok == true {
-			serviceDowntime.Downtime = vv
+			serviceDowntimeVar.Downtime = &vv
 		}
-		srvs = append(srvs, serviceDowntime)
+		srvs = append(srvs, serviceDowntimeVar)
 	}
-	return srvs
+	sendJsonAction(srvs, "fetch", w, r)
 }
 
 func apiAllSubServicesHandler(r *http.Request) interface{} {
