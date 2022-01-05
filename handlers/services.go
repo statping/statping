@@ -551,7 +551,7 @@ func apiAllServicesHandler(r *http.Request) interface{} {
 	return srvs
 }
 
-func apiAllServicesStatusHandler(w http.ResponseWriter, r *http.Request){
+func apiAllServicesStatusHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	var t string
 	if query.Get("time") != "" {

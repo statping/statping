@@ -14,7 +14,7 @@ import (
 
 type ServiceWithDowntime struct {
 	Service
-	Downtime        *downtimes.Downtime `gorm:"-" json:"downtime" yaml:"-"`
+	Downtime *downtimes.Downtime `gorm:"-" json:"downtime" yaml:"-"`
 }
 
 // Service is the main struct for Services
