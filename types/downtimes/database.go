@@ -63,7 +63,6 @@ func FindDowntime(timeVar time.Time) []Downtime {
 	q := db.Where("start <= ? and \"end\" >= ?", timeVar, timeVar)
 	q = q.Order("id ASC ").Find(&downtime)
 	return downtime
-
 }
 
 func (c *Downtime) Create() error {
