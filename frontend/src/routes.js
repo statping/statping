@@ -16,6 +16,9 @@ const Checkins = () => import(/* webpackChunkName: "dashboard" */ '@/components/
 const Failures = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Failures')
 const NotFound = () => import(/* webpackChunkName: "index" */ '@/pages/NotFound')
 const Importer = () => import(/* webpackChunkName: "index" */ '@/components/Dashboard/Importer')
+const DashboardDowntimes = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/DashboardDowntimes')
+const EditDowntime = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/EditDowntime')
+
 
 import VueRouter from "vue-router";
 import Api from "./API";
@@ -138,6 +141,27 @@ const routes = [
         title: 'Statping - Service Failures',
       }
     },{
+      path: 'downtimes',
+      component: DashboardDowntimes,
+      meta: {
+          requiresAuth: true,
+          title: 'Statping - Downtimes',
+      }
+    },{
+      path: 'create_downtime',
+      component: EditDowntime,
+      meta: {
+          requiresAuth: true,
+          title: 'Statping - Create Downtime',
+      }
+    },{
+      path: 'edit_downtime/:id',
+      component: EditDowntime,
+      meta: {
+          requiresAuth: true,
+          title: 'Statping - Update Downtime',
+      }
+    },{
       path: 'messages',
       component: DashboardMessages,
         meta: {
@@ -228,3 +252,4 @@ router.beforeEach((to, from, next) => {
 });
 
 export default router
+
