@@ -12,7 +12,6 @@ import (
 	"github.com/statping/statping/utils"
 	"net/http"
 	"sort"
-	"strconv"
 	"time"
 )
 
@@ -41,23 +40,11 @@ func findService(r *http.Request) (*services.Service, error) {
 	return servicer, nil
 }
 
-func ConvertToUnixTime(str string) (time.Time, error) {
-	i, err := strconv.ParseInt(str, 10, 64)
-	var t time.Time
-	if err != nil {
-		return t, err
-	}
-	tm := time.Unix(i, 0)
-	return tm, nil
-}
-
 func findAllDowntimes(t string) []downtimes.Downtime {
-	var timeVar time.Time
-	if t == "" {
-		timeVar = time.Now()
-	} else {
+	timeVar := time.Now()
+	if t != "" {
 		var e error
-		timeVar, e = ConvertToUnixTime(t)
+		timeVar, e = utils.ConvertToUnixTime(t)
 		if e != nil {
 			return nil
 		}
@@ -564,9 +551,6 @@ func apiAllServicesStatusHandler(w http.ResponseWriter, r *http.Request) {
 		m[dtime[i].ServiceId] = dtime[i]
 	}
 	for _, v := range services.AllInOrder() {
-		if !v.Public.Bool && !IsUser(r) {
-			continue
-		}
 		var serviceDowntimeVar services.ServiceWithDowntime
 		serviceDowntimeVar.Service = v
 		if vv, ok := m[v.Id]; ok == true {

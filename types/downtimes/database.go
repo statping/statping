@@ -3,6 +3,7 @@ package downtimes
 import (
 	"fmt"
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/utils"
 	"strconv"
 	"time"
 )
@@ -62,20 +63,10 @@ func FindByService(service int64, start time.Time, end time.Time) (*[]Downtime, 
 func FindDowntime(timeVar time.Time) []Downtime {
 	var downtime []Downtime
 	q := db.Where("start <= ? and \"end\" >= ?", timeVar, timeVar)
-	q = q.Order("id ASC ").Find(&downtime)
+	q = q.Order("id ASC").Find(&downtime)
 	return downtime
-
 }
 
-func ConvertToUnixTime(str string) (time.Time, error) {
-	i, err := strconv.ParseInt(str, 10, 64)
-	var t time.Time
-	if err != nil {
-		return t, err
-	}
-	tm := time.Unix(i, 0)
-	return tm, nil
-}
 
 func FindAll(vars map[string]string) (*[]Downtime, error) {
 	var downtime []Downtime
@@ -86,11 +77,11 @@ func FindAll(vars map[string]string) (*[]Downtime, error) {
 	startInt, err := strconv.ParseInt(st, 10, 64)
 	endInt, err := strconv.ParseInt(en, 10, 64)
 	if err1 && err2 && (endInt > startInt) {
-		start, err = ConvertToUnixTime(vars["start"])
+		start, err = utils.ConvertToUnixTime(vars["start"])
 		if err != nil {
 			return &downtime, err
 		}
-		end, err = ConvertToUnixTime(vars["end"])
+		end, err = utils.ConvertToUnixTime(vars["end"])
 		if err != nil {
 			return &downtime, err
 		}
