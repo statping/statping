@@ -4,12 +4,18 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"github.com/statping/statping/types/checkins"
+	"github.com/statping/statping/types/downtimes"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/incidents"
 	"github.com/statping/statping/types/messages"
 	"github.com/statping/statping/types/null"
 	"time"
 )
+
+type ServiceWithDowntime struct {
+	Service
+	Downtime *downtimes.Downtime `gorm:"-" json:"downtime" yaml:"-"`
+}
 
 // Service is the main struct for Services
 type Service struct {

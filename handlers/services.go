@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/downtimes"
 	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
@@ -37,6 +38,19 @@ func findService(r *http.Request) (*services.Service, error) {
 		return nil, errors.NotAuthenticated
 	}
 	return servicer, nil
+}
+
+func findAllDowntimes(t string) []downtimes.Downtime {
+	timeVar := time.Now()
+	if t != "" {
+		var e error
+		timeVar, e = utils.ConvertToUnixTime(t)
+		if e != nil {
+			return nil
+		}
+	}
+	downTime := downtimes.FindDowntime(timeVar)
+	return downTime
 }
 
 func findPublicSubService(r *http.Request, service *services.Service) (*services.Service, error) {
@@ -522,6 +536,29 @@ func apiAllServicesHandler(r *http.Request) interface{} {
 		srvs = append(srvs, v)
 	}
 	return srvs
+}
+
+func apiAllServicesStatusHandler(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	var t string
+	if query.Get("time") != "" {
+		t = query.Get("time")
+	}
+	var srvs []services.ServiceWithDowntime
+	dtime := findAllDowntimes(t)
+	m := make(map[int64]downtimes.Downtime)
+	for i := 0; i < len(dtime); i += 1 {
+		m[dtime[i].ServiceId] = dtime[i]
+	}
+	for _, v := range services.AllInOrder() {
+		var serviceDowntimeVar services.ServiceWithDowntime
+		serviceDowntimeVar.Service = v
+		if vv, ok := m[v.Id]; ok == true {
+			serviceDowntimeVar.Downtime = &vv
+		}
+		srvs = append(srvs, serviceDowntimeVar)
+	}
+	sendJsonAction(srvs, "fetch", w, r)
 }
 
 func apiAllSubServicesHandler(r *http.Request) interface{} {
