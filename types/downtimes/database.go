@@ -67,7 +67,6 @@ func FindDowntime(timeVar time.Time) []Downtime {
 	return downtime
 }
 
-
 func FindAll(vars map[string]string) (*[]Downtime, error) {
 	var downtime []Downtime
 	var start time.Time
