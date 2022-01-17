@@ -14,7 +14,7 @@
       <thead>
         <tr>
           <th scope="col">
-            {{ $t('name') }}
+            {{ $t('service') }}
           </th>
           <th
             scope="col"
