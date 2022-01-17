@@ -29,6 +29,16 @@ func NotNumber(val string) bool {
 	return err != nil
 }
 
+func ConvertToUnixTime(str string) (time.Time, error) {
+	i, err := strconv.ParseInt(str, 10, 64)
+	var t time.Time
+	if err != nil {
+		return t, err
+	}
+	tm := time.Unix(i, 0)
+	return tm, nil
+}
+
 // ToInt converts a int to a string
 func ToInt(s interface{}) int64 {
 	switch v := s.(type) {
