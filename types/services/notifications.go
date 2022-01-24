@@ -23,9 +23,12 @@ func sendSuccess(s *Service) {
 		return
 	}
 
+	s.notifyAfterCount = 0
+
 	if s.prevOnline == s.Online {
 		return
 	}
+	s.prevOnline = true
 
 	for _, n := range allNotifiers {
 		notif := n.Select()
@@ -42,9 +45,6 @@ func sendSuccess(s *Service) {
 			notif.LastSent = utils.Now()
 		}
 	}
-
-	s.prevOnline = true
-	s.notifyAfterCount++
 }
 
 func sendFailure(s *Service, f *failures.Failure) {
@@ -63,6 +63,8 @@ func sendFailure(s *Service, f *failures.Failure) {
 		}
 	}
 
+	s.prevOnline = false
+
 	for _, n := range allNotifiers {
 		notif := n.Select()
 		if notif.CanSend() {
@@ -78,9 +80,6 @@ func sendFailure(s *Service, f *failures.Failure) {
 			notif.LastSent = utils.Now()
 		}
 	}
-
-	s.prevOnline = false
-	s.notifyAfterCount++
 }
 
 func logMessage(method string, msg string, error error, onSuccesss bool, serviceId int64) {
