@@ -1,3 +1,6 @@
+# 0.90.80 (01-26-2022)
+- Fixed permissions on /app directory - Thanks twouters
+
 # 0.90.79 (01-24-2022)
 - Updated Russian Language - Thanks meatlayer
 - Docker file fix for BASE_PATH and health checks - Thanks michaelkrieger
