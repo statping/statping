@@ -140,7 +140,7 @@ export default {
     data: function () {
         return {
             isLoading: false,
-            dateTime: new Date().toJSON(),
+            dateTime: '',
             treeData: [],
         };
     },
@@ -152,23 +152,20 @@ export default {
     created: async function () {
         await this.getServiceStatus(this.dateTime);
 
-        const rootNode = getRootNodes(this.serviceStatus);
-        const treeData = getTreeData(rootNode, this.serviceStatus);
-        this.treeData = treeData;
+        this.treeInitialize();
     },
     methods: {
+        treeInitialize: function () {
+            const rootNode = getRootNodes(this.serviceStatus);
+            const treeData = getTreeData(rootNode, this.serviceStatus);
+            this.treeData = treeData;
+        },
         getServiceStatus: async function (dateTime) {
-            let sec = null;
-
             this.isLoading = true;
-            if (!dateTime) {
-                sec = this.convertDateObjToSec(new Date());
-            } else {
-                sec = this.convertDateObjToSec(dateTime);
-            }
 
-            await this.$store.dispatch({ type: 'getServiceStatus', payload: sec });
-            // 1643680748
+            await this.$store.dispatch({ type: 'getServiceStatus', payload: dateTime });
+
+            this.treeInitialize();
             this.isLoading = false;
         },
         handleFilterSearch: function () {
