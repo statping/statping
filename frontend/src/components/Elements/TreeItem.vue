@@ -114,6 +114,7 @@ ul, li {
 .list-child {
  margin-left: 13px;
  position: relative;
+ min-width: 195px;
 }
 
 .list-child li {

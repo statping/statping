@@ -64,7 +64,7 @@
     
       <ul
         v-else
-        class="parent-list-group pl-0 mb-0"
+        class="parent-list-group pl-0 mb-0 overflow-auto"
       >
         <TreeItem
           v-for="service in treeData"
