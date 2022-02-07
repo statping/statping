@@ -161,9 +161,16 @@ export default {
             this.treeData = treeData;
         },
         getServiceStatus: async function (dateTime) {
-            this.isLoading = true;
+            let sec = null;
 
-            await this.$store.dispatch({ type: 'getServiceStatus', payload: dateTime });
+            this.isLoading = true;
+            if (!dateTime) {
+                sec = '';
+            } else {
+                sec = this.convertDateObjToSec(dateTime);
+            }
+
+            await this.$store.dispatch({ type: 'getServiceStatus', payload: sec });
 
             this.treeInitialize();
             this.isLoading = false;
