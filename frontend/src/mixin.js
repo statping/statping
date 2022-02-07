@@ -260,5 +260,8 @@ export default Vue.mixin({
     niceDateWithYear (val) {
       return format(parseISO(val), 'do MMM, yyyy h:mma');
     },
+    convertDateObjToSec (val) {
+      return Math.floor((new Date(val).getTime())/1000);
+    }
   }
 });

@@ -5,6 +5,7 @@ import VueObserveVisibility from 'vue-observe-visibility'
 import VueClipboard from 'vue-clipboard2'
 import VueCookies from 'vue-cookies'
 import VueI18n from 'vue-i18n'
+import VTooltip from 'v-tooltip'
 import router from './routes'
 import "./mixin"
 import "./icons"
@@ -20,6 +21,7 @@ Vue.use(VueRouter);
 Vue.use(VueObserveVisibility);
 Vue.use(VueCookies);
 Vue.use(VueI18n);
+Vue.use(VTooltip);
 
 const i18n = new VueI18n({
   fallbackLocale: "en",
