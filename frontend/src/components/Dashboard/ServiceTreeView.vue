@@ -1,53 +1,87 @@
 <template>
-  <div>      
-    <form>
-      <div class="form-row">
-        <div class="form-group col-sm-3 mb-md-0">
-          <FlatPickr
-            id="start"
-            v-model="dateTime"
-            type="text"
-            name="start"
-            class="form-control form-control-plaintext"
-            :config="{
-              altFormat: 'J M, Y, h:iK',
-              altInput: true,
-              enableTime: true,
-              dateFormat: 'Z',
-              maxDate: new Date().toJSON(),
-            }"
-            placeholder="Select Start Date"
-          />
-        </div>
+  <div>
+    <div class="row">
+      <div class="col-sm-6">
+        <form>
+          <div class="form-row">
+            <div class="form-group col-sm-6 mb-md-0">
+              <FlatPickr
+                id="dateTime"
+                ref="dateTimeRef"
+                v-model="dateTime"
+                type="text"
+                name="dateTime"
+                class="form-control form-control-plaintext"
+                :config="{
+                  altFormat: 'J M, Y, h:iK',
+                  altInput: true,
+                  enableTime: true,
+                  dateFormat: 'Z',
+                  maxDate: new Date().toJSON(),
+                }"
+                placeholder="Select Start Date"
+              />
+            </div>
             
 
-        <div class="form-group col-sm-3 mb-md-0">
-          <div role="group">
-            <button
-              type="button"
-              class="btn btn-primary mr-1"
-              :disabled="dateTime === '' || isLoading"
-              @click.prevent="handleFilterSearch"
-            >
-              {{ $t('search') }}
-            </button>
-            <button
-              type="button"
-              class="btn btn-outline-secondary"
-              @click.prevent="handleClearFilter"
-            >
-              Reset
-            </button>
+            <div class="form-group col-sm-6 mb-md-0">
+              <div role="group">
+                <button
+                  type="submit"
+                  class="btn btn-primary mr-1"
+                  :disabled="dateTime === '' || isLoading"
+                  @click.prevent="handleFilterSearch"
+                >
+                  {{ $t('search') }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  @click.prevent="handleClearFilter"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        </form>
       </div>
-    </form>
+
+      <div class="col-sm-6">
+        <ul class="d-flex justify-content-end align-items-center">
+          <li class="d-flex">
+            <div class="mr-1 text-shade-success">
+              <FontAwesomeIcon
+                icon="circle"
+                class="border border-secondary rounded-circle"
+              />
+            </div>
+            <div>Up</div>
+          </li>
+          <li class="d-flex ml-3">
+            <div class="mr-1 text-shade-warning">
+              <FontAwesomeIcon
+                icon="circle"
+                class="border border-secondary rounded-circle"
+              />
+            </div>
+            <div>Degraded</div>
+          </li>
+          <li class="d-flex ml-3">
+            <div class="mr-1 text-shade-danger">
+              <FontAwesomeIcon
+                icon="circle"
+                class="border border-secondary rounded-circle"
+              />
+            </div>
+            <div>Down</div>
+          </li>
+        </ul>
+      </div>
+    </div>
 
     <div class="mt-3">
-      <h4>Heading</h4>
-      <div
-        v-if="isLoading"
-      >
+      <div v-if="isLoading">
         <div class="col-12 text-center">
           <FontAwesomeIcon
             icon="circle-notch"
@@ -176,6 +210,10 @@ export default {
             this.isLoading = false;
         },
         handleFilterSearch: function () {
+            // Remove focus and close date time picker on enter click.
+            this.$refs.dateTimeRef.$el.nextSibling.blur();
+            this.$refs.dateTimeRef.fp.close();
+
             this.getServiceStatus(this.dateTime);
         },
         handleClearFilter: function () {
@@ -185,7 +223,27 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+ul, li {
+ margin: 0;
+ padding: 0;
+ list-style: none;
+ display: block;
+}
+
+.text-shade-danger {
+ color: #f7cecc;
+ border: red
+}
+
+.text-shade-warning {
+ color: #FFE6CC;
+}
+
+.text-shade-success {
+ color: #D6E7D4;
+}
+
 .parent-list-group li {
  position: relative;
 }
