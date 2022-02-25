@@ -550,12 +550,14 @@ func apiAllServicesStatusHandler(w http.ResponseWriter, r *http.Request) {
 		dtime := downtimes.FindDowntime2()
 		log.Println("FindDowntime2 results")
 		log.Println(dtime)
-		/*for i := 0; i < len(dtime); i+=1 {
+		fmt.Println(dtime)
+		for i := 0; i < len(dtime); i+=1 {
 			downtimeVar := dtime[i]
 			serviceVar, _ := services.Find(downtimeVar.ServiceId)
-
-			m[downtimeVar.ServiceId] = downtimeVar
-		}*/
+			if serviceVar.Online ==false {
+				m[downtimeVar.ServiceId] = downtimeVar
+			}
+		}
 	} else {
 		dtime := findAllDowntimes(t)
 		for i := 0; i < len(dtime); i += 1 {
