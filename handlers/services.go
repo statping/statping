@@ -549,7 +549,7 @@ func apiAllServicesStatusHandler(w http.ResponseWriter, r *http.Request) {
 	if t == "" {
 		for _, v := range services.AllInOrder() {
 			if v.Online == false {
-				downtime:= downtimes.FindDowntime3(v.Id)
+				downtime := downtimes.FindDowntime2(v.Id)
 				m[v.Id] = downtime
 			}
 		}
