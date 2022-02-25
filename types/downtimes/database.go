@@ -53,7 +53,7 @@ func (c *Downtime) BeforeUpdate() error {
 	return c.Validate()
 }
 
-func FindByService(service int64, start time.Time, end time.Time) (*[]Downtime, error) {
+func FindByServiceAndDuration(service int64, start time.Time, end time.Time) (*[]Downtime, error) {
 	var downtime []Downtime
 	q := db.Where("service = ? and start BETWEEN ? AND ? ", service, start, end)
 	q = q.Order("id ASC ").Find(&downtime)
@@ -67,7 +67,7 @@ func FindDowntime(timeVar time.Time) []Downtime {
 	return downtime
 }
 
-func FindDowntime2(service int64) Downtime {
+func FindLatestDowntimeOfService(service int64) Downtime {
 	var downtime Downtime
 	q := db.Where("service = ?", service)
 	q = q.Order("start desc").First(&downtime)

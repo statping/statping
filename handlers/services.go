@@ -545,11 +545,12 @@ func apiAllServicesStatusHandler(w http.ResponseWriter, r *http.Request) {
 		t = query.Get("time")
 	}
 	var srvs []services.ServiceWithDowntime
+	servicesList := services.AllInOrder()
 	m := make(map[int64]downtimes.Downtime)
 	if t == "" {
-		for _, v := range services.AllInOrder() {
+		for _, v := range servicesList {
 			if v.Online == false {
-				downtime := downtimes.FindDowntime2(v.Id)
+				downtime := downtimes.FindLatestDowntimeOfService(v.Id)
 				m[v.Id] = downtime
 			}
 		}
@@ -560,7 +561,7 @@ func apiAllServicesStatusHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	for _, v := range services.AllInOrder() {
+	for _, v := range servicesList {
 		var serviceDowntimeVar services.ServiceWithDowntime
 		serviceDowntimeVar.Service = v
 		if vv, ok := m[v.Id]; ok == true {
