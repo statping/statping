@@ -67,10 +67,9 @@ func FindDowntime(timeVar time.Time) []Downtime {
 	return downtime
 }
 
-func FindDowntime2() []Downtime {
-	var downtime []Downtime
-	db.Raw("select d1.* from downtimes d1 left join downtimes d2 on d1.service = d2.service and d2.start > d1.start where d2.service is NULL;").Scan(&downtime)
-	//db.Select("downtimes.*").Joins("left join downtimes as d2 on d2.service = downtimes.service AND downtimes.start < d2.start").Where("d2.end = ?",nil).Find(&downtime)
+func FindDowntime3(service int64) Downtime {
+	var downtime Downtime
+	db.Raw("select *  from downtimes where service = ? order by start desc limit 1;",service).Scan(&downtime)
 	return downtime
 }
 
