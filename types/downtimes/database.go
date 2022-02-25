@@ -67,8 +67,8 @@ func FindDowntime(timeVar time.Time) []Downtime {
 	return downtime
 }
 
-func FindDowntime2() []Downtime {
-	var downtime []Downtime
+func FindDowntime2() interface{} {
+	var downtime interface{}
 	db.Raw("SELECT DISTINCT ON (downtimes.service) downtimes.* FROM downtimes ORDER BY service ASC, start DESC;").Scan(&downtime)
 	//db.Select("downtimes.*").Joins("left join downtimes as d2 on d2.service = downtimes.service AND downtimes.start < d2.start").Where("d2.end = ?",nil).Find(&downtime)
 	return downtime
