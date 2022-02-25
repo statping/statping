@@ -547,24 +547,20 @@ func apiAllServicesStatusHandler(w http.ResponseWriter, r *http.Request) {
 	var srvs []services.ServiceWithDowntime
 	m := make(map[int64]downtimes.Downtime)
 	if t == "" {
-		timeNow := time.Now()
-		dtime:=downtimes.FindDowntime2()
+		dtime := downtimes.FindDowntime2()
 		for i := 0; i < len(dtime); i++ {
 			downtimeVar := dtime[i]
-			serviceVar,_ := services.Find(downtimeVar.ServiceId)
-			checkInterval := time.Duration(serviceVar.Interval)
-			timeInstance := timeNow.Add(-time.Second * checkInterval)
-			if downtimeVar.End == nil || timeInstance.Before(*(downtimeVar.End)) || timeInstance.Equal(*(downtimeVar.End)) {
+			serviceVar, _ := services.Find(downtimeVar.ServiceId)
+			if serviceVar.Online == false {
 				m[downtimeVar.ServiceId] = downtimeVar
 			}
 		}
-	}else{
+	} else {
 		dtime := findAllDowntimes(t)
 		for i := 0; i < len(dtime); i += 1 {
 			m[dtime[i].ServiceId] = dtime[i]
 		}
 	}
-
 
 	for _, v := range services.AllInOrder() {
 		var serviceDowntimeVar services.ServiceWithDowntime
