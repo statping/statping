@@ -69,7 +69,8 @@ func FindDowntime(timeVar time.Time) []Downtime {
 
 func FindDowntime3(service int64) Downtime {
 	var downtime Downtime
-	db.Raw("select *  from downtimes where service = ? order by start desc limit 1;",service).Scan(&downtime)
+	q := db.Where("service = ?",service)
+	q = q.Order("start desc").First(&downtime)
 	return downtime
 }
 
