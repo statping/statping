@@ -276,6 +276,7 @@ func (s Service) OnlineDaysPercent(days int) float32 {
 func (s *Service) OnlineSince(ago time.Time) float32 {
 	failsList := s.FailuresSince(ago).Count()
 	hitsList := s.HitsSince(ago).Count()
+	totalList := failsList+hitsList
 
 	if failsList == 0 {
 		s.Online24Hours = 100.00
