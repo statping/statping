@@ -262,7 +262,7 @@ jobs:
           MOBILE_NUMBER: ${{ secrets.MOBILE_NUMBER }}
           PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
           PUSHOVER_API: ${{ secrets.PUSHOVER_API }}
-          SLACK_URL: ${{ secrets.SLACK_URL }}
+          SLACK_URL: https://hooks.slack.com/services/TTJ1B90DP/RENU20O9M/9uI823SUnYBuGcxYlpSimD6H
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
           TWILIO_SID: ${{ secrets.TWILIO_SID }}
