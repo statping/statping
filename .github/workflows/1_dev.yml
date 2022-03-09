@@ -277,12 +277,12 @@ jobs:
           SNS_REGION: ${{ secrets.SNS_REGION }}
           SNS_TOPIC: ${{ secrets.SNS_TOPIC }}
 
-      - name: Coveralls Testing Coverage
-        run: |
-          go get github.com/mattn/goveralls
-          goveralls -coverprofile=coverage.out -repotoken $COVERALLS
-        env:
-          COVERALLS: ${{ secrets.COVERALLS }}
+#      - name: Coveralls Testing Coverage
+#        run: |
+#          go get github.com/mattn/goveralls
+#          goveralls -coverprofile=coverage.out -repotoken $COVERALLS
+#        env:
+#          COVERALLS: ${{ secrets.COVERALLS }}
 
   test-postman-sqlite:
     needs: frontend
