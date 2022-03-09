@@ -3,13 +3,13 @@ COMMIT=$(shell git rev-parse HEAD)
 SIGN_KEY=B76D61FAA6DB759466E83D9964B9C6AAE2D55278
 BINARY_NAME=statping
 GOBUILD=go build -a
-GOVERSION=1.14.0
-NODE_VERSION=12.18.2
+GOVERSION=1.17.8
+NODE_VERSION=16.14.0
 XGO=xgo -go $(GOVERSION) --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}"
 TRVIS_SECRET=O3/2KTOV8krv+yZ1EB/7D1RQRe6NdpFUEJNJkMS/ollYqmz3x2mCO7yIgIJKCKguLXZxjM6CxJcjlCrvUwibL+8BBp7xJe4XFIOrjkPvbbVPry4HkFZCf2GfcUK6o4AByQ+RYqsW2F17Fp9KLQ1rL3OT3eLTwCAGKx3tlY8y+an43zkmo5dN64V6sawx26fh6XTfww590ey+ltgQTjf8UPNup2wZmGvMo9Hwvh/bYR/47bR6PlBh6vhlKWyotKf2Fz1Bevbu0zc35pee5YlsrHR+oSF+/nNd/dOij34BhtqQikUR+zQVy9yty8SlmneVwD3yOENvlF+8roeKIXb6P6eZnSMHvelhWpAFTwDXq2N3d/FIgrQtLxsAFTI3nTHvZgs6OoTd6dA0wkhuIGLxaL3FOeztCdxP5J/CQ9GUcTvifh5ArGGwYxRxQU6rTgtebJcNtXFISP9CEUR6rwRtb6ax7h6f1SbjUGAdxt+r2LbEVEk4ZlwHvdJ2DtzJHT5DQtLrqq/CTUgJ8SJFMkrJMp/pPznKhzN4qvd8oQJXygSXX/gz92MvoX0xgpNeLsUdAn+PL9KketfR+QYosBz04d8k05E+aTqGaU7FUCHPTLwlOFvLD8Gbv0zsC/PWgSLXTBlcqLEz5PHwPVHTcVzspKj/IyYimXpCSbvu1YOIjyc=
 PUBLISH_BODY='{ "request": { "branch": "master", "message": "Homebrew update version v${VERSION}", "config": { "env": { "VERSION": "${VERSION}", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
-TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "merge_mode": "replace", "language": "go", "go": 1.14, "install": true, "sudo": "required", "services": ["docker"], "env": { "secure": "${TRVIS_SECRET}" }, "before_deploy": ["git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [{ "provider": "releases", "api_key": "$$GITHUB_TOKEN", "file_glob": true, "file": "build/*", "skip_cleanup": true, "on": { "branch": "master" } }], "before_script": ["rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install stable", "nvm install 10.17.0", "nvm use 10.17.0 --default", "npm install -g sass yarn cross-env", "pip install --user awscli"], "script": ["make release"], "after_success": [], "after_deploy": ["make post-release"] } } }'
+TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "merge_mode": "replace", "language": "go", "go": 1.17, "install": true, "sudo": "required", "services": ["docker"], "env": { "secure": "${TRVIS_SECRET}" }, "before_deploy": ["git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [{ "provider": "releases", "api_key": "$$GITHUB_TOKEN", "file_glob": true, "file": "build/*", "skip_cleanup": true, "on": { "branch": "master" } }], "before_script": ["rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install stable", "nvm install 16.14.0", "nvm use 16.14.0 --default", "npm install -g sass yarn cross-env", "pip install --user awscli"], "script": ["make release"], "after_success": [], "after_deploy": ["make post-release"] } } }'
 TEST_DIR=$(GOPATH)/src/github.com/statping-ng/statping-ng
 PATH:=$(GOPATH)/bin:$(PATH)
 OS = freebsd linux openbsd
@@ -37,16 +37,16 @@ lint:
 	goimports ./...
 
 up:
-	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml up -d --remove-orphans
+	docker compose -f docker compose.yml -f dev/docker compose.full.yml up -d --remove-orphans
 	make print_details
 
 down:
-	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml down --volumes --remove-orphans
+	docker compose -f docker compose.yml -f dev/docker compose.full.yml down --volumes --remove-orphans
 
 lite: clean
 	docker build -t statping-ng/statping-ng:dev -f dev/Dockerfile.dev .
-	docker-compose -f dev/docker-compose.lite.yml down
-	docker-compose -f dev/docker-compose.lite.yml up --remove-orphans
+	docker compose -f dev/docker compose.lite.yml down
+	docker compose -f dev/docker compose.lite.yml up --remove-orphans
 
 reup: down clean compose-build-full up
 
@@ -94,37 +94,37 @@ go-run:
 	go run ./cmd
 
 start:
-	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml start
+	docker compose -f docker compose.yml -f dev/docker compose.full.yml start
 
 stop:
-	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml stop
+	docker compose -f docker compose.yml -f dev/docker compose.full.yml stop
 
 logs:
 	docker logs statping --follow
 
 db-up:
-	docker-compose -f dev/docker-compose.db.yml up -d --remove-orphans
+	docker compose -f dev/docker compose.db.yml up -d --remove-orphans
 
 db-down:
-	docker-compose -f dev/docker-compose.db.yml down --volumes --remove-orphans
+	docker compose -f dev/docker compose.db.yml down --volumes --remove-orphans
 
 console:
 	docker exec -t -i statping /bin/sh
 
 compose-build-full: 
-	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml build --parallel --build-arg VERSION=${VERSION}
+	docker compose -f docker compose.yml -f dev/docker compose.full.yml build --parallel --build-arg VERSION=${VERSION}
 
 docker-latest: 
 	docker build -t statping-ng/statping-ng:latest --build-arg VERSION=${VERSION} .
 
 docker-test:
-	docker-compose -f docker-compose.test.yml up --remove-orphans
+	docker compose -f docker compose.test.yml up --remove-orphans
 
 modd:
 	modd -f ./dev/modd.conf
 
 top:
-	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml top
+	docker compose -f docker compose.yml -f dev/docker compose.full.yml top
 
 frontend-build:
 	@echo "Removing old frontend distributions..."
@@ -382,7 +382,7 @@ delve:
 
 check:
 	@echo "Checking the programs required for the build are installed..."
-	@echo "go:     $(shell go version) - $(shell which go)" && go version >/dev/null 2>&1 || (echo "ERROR: go 1.14 is required."; exit 1)
+	@echo "go:     $(shell go version) - $(shell which go)" && go version >/dev/null 2>&1 || (echo "ERROR: go 1.17 is required."; exit 1)
 	@echo "node:   $(shell node --version) - $(shell which node)" && node --version >/dev/null 2>&1 || (echo "ERROR: node 12.x is required."; exit 1)
 	@echo "yarn:   $(shell yarn --version) - $(shell which yarn)" && yarn --version >/dev/null 2>&1 || (echo "ERROR: yarn is required."; exit 1)
 	@echo "All required programs are installed!"
