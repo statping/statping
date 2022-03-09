@@ -129,7 +129,7 @@ jobs:
           COMMIT: ${{ github.sha }}
         with:
           xgo_version: latest
-          go_version: 1.17.7
+          go_version: 1.17.8
           dest: build
           prefix: statping
           targets: ${{ matrix.platform }}/${{ matrix.arch }}
