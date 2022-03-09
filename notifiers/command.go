@@ -1,15 +1,14 @@
 package notifiers
 
 import (
-	"github.com/statping-ng/statping-ng/types/errors"
+	"time"
+
 	"github.com/statping-ng/statping-ng/types/failures"
 	"github.com/statping-ng/statping-ng/types/notifications"
 	"github.com/statping-ng/statping-ng/types/notifier"
 	"github.com/statping-ng/statping-ng/types/null"
 	"github.com/statping-ng/statping-ng/types/services"
 	"github.com/statping-ng/statping-ng/utils"
-	"strings"
-	"time"
 )
 
 var _ notifier.Notifier = (*commandLine)(nil)
@@ -42,15 +41,7 @@ var Command = &commandLine{&notifications.Notification{
 
 func runCommand(cmd string) (string, string, error) {
 	utils.Log.Infof("Command notifier sending: %s", cmd)
-	cmdApp := strings.Split(cmd, " ")
-	if len(cmd) == 0 {
-		return "", "", errors.New("you need at least 1 command")
-	}
-	var cmdArgs []string
-	if len(cmd) > 1 {
-		cmdArgs = append(cmdArgs, cmd[1:])
-	}
-	outStr, errStr, err := utils.Command(cmdApp[0], cmdArgs...)
+	outStr, errStr, err := utils.Command("sh", "-c", cmd)
 	return outStr, errStr, err
 }
 
