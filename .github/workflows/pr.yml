@@ -41,6 +41,7 @@ jobs:
         run: yarn
 
       - name: Download Go mods
+        if: steps.golangcache.outputs.cache-hit != 'true'
         run: |
           go mod download
           go mod verify
