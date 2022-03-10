@@ -93,7 +93,7 @@ func apiAllDowntimesForServiceHandler(w http.ResponseWriter, r *http.Request) {
 	serviceId := utils.ToInt(vars["service_id"])
 	ninetyDaysAgo := time.Now().Add(time.Duration(-90*24) * time.Hour)
 
-	downtime, err := downtimes.FindByService(serviceId, ninetyDaysAgo, time.Now())
+	downtime, err := downtimes.FindByServiceAndDuration(serviceId, ninetyDaysAgo, time.Now())
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return

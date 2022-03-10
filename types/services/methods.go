@@ -68,7 +68,7 @@ func (s Service) Duration() time.Duration {
 
 func (s Service) DowntimeData(start time.Time, end time.Time) (*UptimeSeries, *[]downtimes.Downtime, error) {
 
-	downtimesList, _ := downtimes.FindByService(s.Id, start, end)
+	downtimesList, _ := downtimes.FindByServiceAndDuration(s.Id, start, end)
 
 	response := &UptimeSeries{
 		Start:    start,
