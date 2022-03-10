@@ -124,12 +124,12 @@ ul, li {
 
 .list-child {
  margin-left: 13px;
- position: relative;
  min-width: 195px;
 }
 
 .list-child li {
  padding: 0 0 0 28px;
+ position: relative;
 }
 
 .list-child li::before {

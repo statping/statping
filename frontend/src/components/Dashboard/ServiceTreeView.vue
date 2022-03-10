@@ -142,9 +142,7 @@ const getRootNodes = (data) => {
 const getTreeData = (parentServices, serviceStatus) => {
     const treeData = [];
 
-    for (let i=0; i<parentServices.length; i++) {
-        const parentService = parentServices[i];
-
+    parentServices.forEach((parentService) => {
         if (!parentService.sub_services_detail) {
             treeData.push({ parent: parentService, children: [] });
         } else {
@@ -162,7 +160,8 @@ const getTreeData = (parentServices, serviceStatus) => {
 
             treeData.push({ parent: parentService, children });
         }
-    }
+    });
+    
 
     return treeData;
 };
