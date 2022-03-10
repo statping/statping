@@ -24,9 +24,9 @@
       </div>
       
       <div
-        v-tooltip="{ content: `${item.parent.downtime ? `${niceDateWithYear(item.parent.downtime.start)} - ${niceDateWithYear(item.parent.downtime.end)}`: ''}`, offset: 5, autoHide: true}"
+        v-tooltip="{ content: `${item.parent.downtime ? `${niceDateWithYear(startDate)} - ${niceDateWithYear(endDate)}` : ''}`, offset: 5, autoHide: true}"
         class="parent-name rounded-right"
-        :class="[{ 'cursor-text rounded': item.children.length === 0 }, item.parent.downtime ? item.parent.downtime.sub_status === 'down' ? 'bg-shade-danger' : 'bg-shade-warning' : 'bg-shade-success']"
+        :class="[{ 'cursor-text rounded': item.children.length === 0 }, item.parent.downtime ? downtimeStatus === 'down' ? 'bg-shade-danger' : 'bg-shade-warning' : 'bg-shade-success']"
       >
         {{ item.parent.name }}
       </div>
@@ -59,6 +59,17 @@ export default {
         return {
             isOpen: false,
         };
+    },
+    computed: {
+        startDate: function () {
+            return this.item.parent.downtime?.start;
+        },
+        endDate: function () {
+            return this.item.parent.downtime?.end;
+        },
+        downtimeStatus: function () {
+            return this.item.parent.downtime?.sub_status;
+        }
     },
     methods: {
         handleIsOpen: function () {

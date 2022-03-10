@@ -116,7 +116,7 @@ import FlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
 
 const getRootNodes = (data) => {
-    if (!data || data.lenght === 0) {
+    if (!data || data.length === 0) {
         return;
     }
 
@@ -143,14 +143,16 @@ const getTreeData = (parentServices, serviceStatus) => {
     const treeData = [];
 
     for (let i=0; i<parentServices.length; i++) {
-        if (!parentServices[i].sub_services_detail) {
-            treeData.push({ parent: parentServices[i], children: [] });
+        const parentService = parentServices[i];
+
+        if (!parentService.sub_services_detail) {
+            treeData.push({ parent: parentService, children: [] });
         } else {
-            const subServices = Object.keys(parentServices[i].sub_services_detail).reduce((acc, key) => {
+            const subServices = Object.keys(parentService.sub_services_detail).reduce((acc, key) => {
                 const service = serviceStatus.find((item) => item.id == key);
 
                 if (service) {
-                    acc.push({ ...service, ...parentServices[i].sub_services_detail[key] });
+                    acc.push({ ...service, ...parentService.sub_services_detail[key] });
                 }
 
                 return acc;
@@ -158,7 +160,7 @@ const getTreeData = (parentServices, serviceStatus) => {
 
             const children = getTreeData(subServices, serviceStatus);
 
-            treeData.push({ parent: parentServices[i], children });
+            treeData.push({ parent: parentService, children });
         }
     }
 
