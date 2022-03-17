@@ -258,7 +258,14 @@ export default Vue.mixin({
       return addSeconds(date, amount)
     },
     niceDateWithYear (val) {
+      if(!val) {
+        return '';
+      }
+      
       return format(parseISO(val), 'do MMM, yyyy h:mma');
     },
+    convertDateObjToSec (val) {
+      return Math.floor((new Date(val).getTime())/1000);
+    }
   }
 });

@@ -33,6 +33,7 @@ export default new Vuex.Store({
     admin: false,
     user: false,
     loggedIn: false,
+    serviceStatus: [],
     modal: {
       visible: false,
       title: "Modal Header",
@@ -155,6 +156,9 @@ export default new Vuex.Store({
     },
     setDowntimes (state, downtimes) {
       state.downtimes = downtimes;
+    },
+    setServiceStatus (state, serviceStatus) {
+      state.serviceStatus = serviceStatus;
     }
   },
   actions: {
@@ -165,6 +169,10 @@ export default new Vuex.Store({
     async getDowntimes (context, { payload }) {
       const { output } = await Api.downtimes(payload);
       context.commit('setDowntimes', output ?? []);
+    },
+    async getServiceStatus (context, { payload }) {
+      const { output } = await Api.service_status(payload);
+      context.commit("setServiceStatus", output ?? []);
     },
     async loadCore(context) {
       const core = await Api.core()

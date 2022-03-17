@@ -1,5 +1,13 @@
 <template>
-    <div class="col-12">
+  <div class="col-12">
+    <div class="card contain-card mb-4">
+      <div class="card-header">
+        Services Tree View
+      </div>
+      <div class="card-body">
+        <ServiceTreeView />
+      </div>
+    </div>
 
         <div class="card contain-card mb-4">
             <div class="card-header">{{ $t('services') }}
@@ -64,7 +72,6 @@
         <FormGroup v-if="$store.state.admin" :edit="editChange" :in_group="group"/>
 
     </div>
-
 </template>
 
 <script>
@@ -73,7 +80,8 @@
   const ToggleSwitch = () => import(/* webpackChunkName: "dashboard" */ '@/forms/ToggleSwitch')
   const ServicesList = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/ServicesList')
   import Api from "../../API";
-  const draggable = () => import(/* webpackChunkName: "dashboard" */ 'vuedraggable')
+  const draggable = () => import(/* webpackChunkName: "dashboard" */ 'vuedraggable');
+  const ServiceTreeView = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/ServiceTreeView');
 
   export default {
       name: 'DashboardServices',
@@ -82,7 +90,8 @@
           ServicesList,
           ToggleSwitch,
           FormGroup,
-          draggable
+          draggable,
+          ServiceTreeView
       },
       data() {
           return {

@@ -303,6 +303,10 @@ class Api {
   async downtime_delete (id) {
       return axios.delete(`/api/downtimes/${id}`).then((response) => response.data);
   }
+
+  async service_status (sec) {
+      return axios.get(`/api/services/status${sec && `?time=${sec}`}`).then((response) => response.data);
+  }
 }
 const api = new Api()
 export default api
