@@ -10,6 +10,7 @@ import SubServiceCard from "./SubServiceCard";
 // import ServiceLoader from "./ServiceLoader";
 // import DateUtils from "../utils/DateUtils";
 import infoIcon from "../static/info.svg";
+import { analyticsTrack } from "../utils/analytics";
 
 const GroupItem = ({ service, showPlusButton }) => {
   const [collapse, setCollapse] = useState(false);
@@ -43,6 +44,12 @@ const GroupItem = ({ service, showPlusButton }) => {
     } else {
       setCollapse(true);
     }
+
+    analyticsTrack({
+      objectName: 'Test object',
+      actionName: 'clicked',
+      screen: 'Home page'
+    })
   };
 
   const closeCollapse = () => {

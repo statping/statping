@@ -17,6 +17,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.15",
+    "@razorpay/universe-utils": "^5.1.2",
     "apexcharts": "^3.28.1",
     "axios": "^0.21.1",
     "date-fns": "^2.23.0",

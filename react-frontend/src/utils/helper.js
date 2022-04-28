@@ -57,3 +57,11 @@ export const calcPer = (uptime, downtime) => {
 //   });
 //   return arrayStr.join("<br/>");
 // }
+
+/* Delimiters are space / underscore */
+export function titleCase(sentence) {
+  return (sentence || '')
+    .split(/\s+|_/)
+    .map((word) => word.charAt(0).toUpperCase() + word.substr(1).toLowerCase())
+    .join(' ');
+}
