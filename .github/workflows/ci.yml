@@ -1,5 +1,8 @@
 name: CI
 on: [push]
+env:
+  GITHUB_ACCESS_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+  NPM_RAZORPAY_TOKEN: ${{ secrets.NPM_RAZORPAY_TOKEN }}
 jobs:
   cancel:
     runs-on: [ubuntu-latest]
