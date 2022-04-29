@@ -4,7 +4,7 @@ import { titleCase } from './helper';
 export const sendToLumberjack = ({ eventName, properties = {} }) => {
 	const body = {
 		mode: 'live',
-		key: window.LUMBERJACK_API_KEY,
+		key: 'test_key_1',
 		events: [
 			{
 				event_type: 'test_source',
@@ -18,7 +18,7 @@ export const sendToLumberjack = ({ eventName, properties = {} }) => {
 		],
 	};
 
-	fetch(window.LUMBERJACK_API_URL, {
+	fetch('https://lumberjack.stage.razorpay.in/v1/track', {
 		method: 'post',
 		body: JSON.stringify(body),
 		headers: {
