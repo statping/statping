@@ -60,7 +60,9 @@ jobs:
           tags: razorpay/statping:service_${{ github.sha }}
           push: true
           file: ./Dockerfile
-          build-args: GIT_COMMIT_HASH=${{ github.sha }}
+          build-args: |
+            GIT_COMMIT_HASH=${{ github.sha }}
+            GIT_TOKEN=${{ secrets.GIT_TOKEN }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
         env:
