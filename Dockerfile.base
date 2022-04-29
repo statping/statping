@@ -14,6 +14,7 @@ RUN yarn build && yarn cache clean
 WORKDIR /statping-react
 COPY ./react-frontend/package.json .
 COPY ./react-frontend/yarn.lock .
+COPY ./react-frontend/.npmrc .
 RUN yarn install --pure-lockfile --network-timeout 1000000
 COPY ./react-frontend/ .
 RUN yarn build && yarn cache clean
