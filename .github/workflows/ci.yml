@@ -50,7 +50,7 @@ jobs:
           build-args: |
             GIT_COMMIT_HASH=${{ github.sha }}
             GIT_TOKEN=${{ secrets.GIT_TOKEN }}
-            GITHUB_ACCESS_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+            GITHUB_ACCESS_TOKEN=${{ secrets.CI_BOT_TOKEN }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
         env:

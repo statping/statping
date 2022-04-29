@@ -3,7 +3,7 @@ LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG BUILDPLATFORM
 ARG GITHUB_ACCESS_TOKEN
 
-ENV GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN}
+ENV GITHUB_ACCESS_TOKEN ${GITHUB_ACCESS_TOKEN}
 
 # Build vue frontent
 WORKDIR /statping
