@@ -4,10 +4,10 @@ import { titleCase } from './helper';
 export const sendToLumberjack = ({ eventName, properties = {} }) => {
 	const body = {
 		mode: 'live',
-		key: 'test_key_1',
+		key: '10pYUm55sa39zgTN1gzNwQzNyQjM54Cg',
 		events: [
 			{
-				event_type: 'test_source',
+				event_type: 'website',
 				event: eventName,
 				event_version: 'v1',
 				timestamp: new Date().getTime(),
