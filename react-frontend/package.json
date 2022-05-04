@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
-    "build": "rm -rf build && GENERATE_SOURCEMAP=false react-scripts build",
-    "build:production": "rm -rf build && GENERATE_SOURCEMAP=false REACT_APP_ENV=production react-scripts build",
+    "start": "env-cmd -f ./configs/dev.env react-scripts start",
+    "build": "env-cmd -f ./configs/prod.env rm -rf build && GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -22,6 +21,7 @@
     "apexcharts": "^3.28.1",
     "axios": "^0.21.1",
     "date-fns": "^2.23.0",
+    "env-cmd": "^10.1.0",
     "framer-motion": "^4",
     "node-sass": "^6.0.1",
     "react": "^17.0.2",

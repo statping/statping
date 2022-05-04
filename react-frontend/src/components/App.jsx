@@ -7,7 +7,7 @@ import Navigation from "./Navbar";
 import { initLumberjack } from "../utils/trackers";
 
 const App = () => {
-  console.log(`Application running on ${JSON.stringify(process.env)} mode.`);
+  console.log(`Application running on ${process.env.NODE_ENV} mode.`);
   useEffect(() => {
     initLumberjack();
   }, [])
