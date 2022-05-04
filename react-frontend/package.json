@@ -5,6 +5,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "rm -rf build && GENERATE_SOURCEMAP=false react-scripts build",
+    "build:production": "rm -rf build && GENERATE_SOURCEMAP=false REACT_APP_ENV=production react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

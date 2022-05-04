@@ -20,7 +20,8 @@ COPY ./react-frontend/yarn.lock .
 COPY ./react-frontend/.npmrc .
 RUN yarn install --pure-lockfile --network-timeout 1000000
 COPY ./react-frontend/ .
-RUN yarn build && yarn cache clean
+COPY ./react-frontend/.env.production .
+RUN yarn build:production && yarn cache clean
 
 # Statping Golang BACKEND building from source
 # Creates "/go/bin/statping" and "/usr/local/bin/sass" for copying
