@@ -9,6 +9,7 @@ import { initLumberjack } from "../utils/trackers";
 const App = () => {
   console.log(`Application running on ${process.env.NODE_ENV} mode.`);
   useEffect(() => {
+    console.log(navigator);
     initLumberjack();
   }, [])
 

@@ -6,10 +6,20 @@ import Button from "../Button";
 
 import RzpLogo from "../../static/razorpay-logo-white.svg";
 import indiaFlagSvg from "./images/india-flag.svg";
+import { analyticsTrack } from "../../utils/analytics";
 
-const RazorpayLogoLink = () => (
-  <Link
+const RazorpayLogoLink = () => {
+  const sendAnalytics = () => {
+    analyticsTrack({
+      objectName: 'Home Page',
+      actionName: 'clicked',
+      screen: 'Home page'
+    })
+  }
+
+  return <Link
     to="https://razorpay.com/"
+    onClick={sendAnalytics}
     isExternal
     py={{ xxs: "6", lg: "7" }}
     paddingRight={{ xxs: "0", lg: "22" }}
@@ -24,7 +34,15 @@ const RazorpayLogoLink = () => (
       alt="Razorpay Logo"
     />
   </Link>
-);
+};
+
+const sendAnalytics = (event) => {
+  analyticsTrack({
+    objectName: event.target.name,
+    actionName: 'clicked',
+    screen: 'Home page'
+  })
+}
 
 const Navigation = () => {
   return (
@@ -67,7 +85,10 @@ const Navigation = () => {
           </Tooltip>
           <Button
             as={Link}
+            onClick={sendAnalytics}
+            type="button"
             size="sm"
+            name="login"
             colorScheme="link"
             to="https://dashboard.razorpay.com/#/access/signin"
           >
@@ -75,9 +96,12 @@ const Navigation = () => {
           </Button>
           <Button
             as={Link}
+            onClick={sendAnalytics}
+            type="button"
             to="https://dashboard.razorpay.com/signup"
             marginLeft={{ base: "1", xs: "4" }}
             size="sm"
+            name="signup"
             colorScheme="white"
             display={{ base: "none", xxs: "none", lg: "inline-block" }}
           >

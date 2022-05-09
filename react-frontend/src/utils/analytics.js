@@ -1,5 +1,5 @@
 import errorService from '@razorpay/universe-utils/errorService';
-import { titleCase } from './helper';
+import { getCurrentBrowser, isMobile, titleCase } from './helper';
 
 export const sendToLumberjack = ({ eventName, properties = {} }) => {
 	const body = {
@@ -70,6 +70,7 @@ export const analyticsTrack = ({
 
 	const eventTimestamp = new Date().toISOString();
 	const eventName = titleCase(`${objectName} ${actionName}`);
+	const browser = getCurrentBrowser();
 
 	if (toLumberjack) {
 		sendToLumberjack({
@@ -78,6 +79,8 @@ export const analyticsTrack = ({
 				...properties,
 				screen,
 				eventTimestamp,
+				browser,
+				mobile: isMobile(),
 			},
 		});
 	}

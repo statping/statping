@@ -1,6 +1,15 @@
 import React from "react";
+import { analyticsTrack } from "../utils/analytics";
 
 const ContentHeader = () => {
+  const sendAnalytics = () => {
+    analyticsTrack({
+      objectName: 'Support Page',
+      actionName: 'clicked',
+      screen: 'Home page'
+    })
+  }
+
   return (
     <div className="header">
       <h1 className="header-title mt-4 mb-3 font-24 fw-700">
@@ -13,6 +22,7 @@ const ContentHeader = () => {
         real-time, operational issue with one of our products that is not
         described below, please reach out to{" "}
         <a
+          onClick={sendAnalytics}
           target="_blank"
           rel="noopener noreferrer"
           href="https://razorpay.com/support/"

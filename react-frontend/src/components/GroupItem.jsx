@@ -46,7 +46,7 @@ const GroupItem = ({ service, showPlusButton }) => {
     }
 
     analyticsTrack({
-      objectName: 'Test object',
+      objectName: 'Service Expand',
       actionName: 'clicked',
       screen: 'Home page'
     })
@@ -54,6 +54,12 @@ const GroupItem = ({ service, showPlusButton }) => {
 
   const closeCollapse = () => {
     setCollapse(false);
+
+    analyticsTrack({
+      objectName: 'Service Collapse',
+      actionName: 'clicked',
+      screen: 'Home page'
+    })
   };
 
   const handleMouseOver = (service) => {
