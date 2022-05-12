@@ -3,20 +3,21 @@ import { Box, Tooltip } from "@chakra-ui/react";
 import Link from "../Link";
 import Image from "../Image";
 import Button from "../Button";
+import analyticsService from '@razorpay/universe-utils/analytics';
 
 import RzpLogo from "../../static/razorpay-logo-white.svg";
 import indiaFlagSvg from "./images/india-flag.svg";
-import { analyticsTrack } from "../../utils/analytics";
+import { analyticsTrack } from "../../utils/trackers";
+
+const sendAnalytics = (event) => {
+  analyticsTrack({
+    objectName: event.target.name || 'home page',
+    actionName: 'clicked',
+    screen: 'Home page'
+  })
+}
 
 const RazorpayLogoLink = () => {
-  const sendAnalytics = () => {
-    analyticsTrack({
-      objectName: 'Home Page',
-      actionName: 'clicked',
-      screen: 'Home page'
-    })
-  }
-
   return <Link
     to="https://razorpay.com/"
     onClick={sendAnalytics}
@@ -35,14 +36,6 @@ const RazorpayLogoLink = () => {
     />
   </Link>
 };
-
-const sendAnalytics = (event) => {
-  analyticsTrack({
-    objectName: event.target.name,
-    actionName: 'clicked',
-    screen: 'Home page'
-  })
-}
 
 const Navigation = () => {
   return (

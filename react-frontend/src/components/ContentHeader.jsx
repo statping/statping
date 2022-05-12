@@ -1,5 +1,5 @@
 import React from "react";
-import { analyticsTrack } from "../utils/analytics";
+import { analyticsTrack } from "../utils/trackers";
 
 const ContentHeader = () => {
   const sendAnalytics = () => {

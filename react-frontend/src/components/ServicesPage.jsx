@@ -12,7 +12,7 @@ import ServiceLoader from "./ServiceLoader";
 import API from "../config/API";
 import { STATUS_COLOR, STATUS_ICON, STATUS_TEXT } from "../utils/constants";
 import { findStatus } from "../utils/helper";
-import { analyticsTrack } from "../utils/analytics";
+import { analyticsTrack } from "../utils/trackers";
 
 const ServicesPage = () => {
   // const data = messages.filter((m) => inRange(m) && m.service === 0);

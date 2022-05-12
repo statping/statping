@@ -66,31 +66,14 @@ export function titleCase(sentence) {
 		.join(' ');
 }
 
-// Check for browser.
-export function getCurrentBrowser() {
-	const userAgent = navigator.userAgent;
-	let browserName;
-
-	if (userAgent.match(/chrome|chromium|crios/i)) {
-		browserName = 'chrome';
-	} else if (userAgent.match(/firefox|fxios/i)) {
-		browserName = 'firefox';
-	} else if (userAgent.match(/safari/i)) {
-		browserName = 'safari';
-	} else if (userAgent.match(/opr\//i)) {
-		browserName = 'opera';
-	} else if (userAgent.match(/edg/i)) {
-		browserName = 'edge';
-	} else {
-		browserName = 'No browser detection';
-	}
-
-	return browserName;
+export const setUerId = (id) => {
+  localStorage.setItem('stat_user_id',id);
 }
 
-// Check for mobile devices.
-export function isMobile() {
-	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-		navigator.userAgent
-	);
+export const getUserId = () => {
+  return localStorage.getItem('stat_user_id');
+}
+
+export const generateUUID = (length) => {
+  return Array.from(Array(length), () => Math.floor(Math.random() * 36).toString(36)).join('')
 }

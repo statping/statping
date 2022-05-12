@@ -5,11 +5,15 @@ import theme from "../theme";
 import ServicesPage from "./ServicesPage";
 import Navigation from "./Navbar";
 import { initLumberjack } from "../utils/trackers";
+import { generateUUID, getUserId, setUerId } from "../utils/helper";
 
 const App = () => {
   console.log(`Application running on ${process.env.NODE_ENV} mode.`);
   useEffect(() => {
-    console.log(navigator);
+    if(!getUserId()) {
+      setUerId(generateUUID(14));
+    }
+
     initLumberjack();
   }, [])
 

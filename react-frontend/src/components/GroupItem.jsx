@@ -10,7 +10,7 @@ import SubServiceCard from "./SubServiceCard";
 // import ServiceLoader from "./ServiceLoader";
 // import DateUtils from "../utils/DateUtils";
 import infoIcon from "../static/info.svg";
-import { analyticsTrack } from "../utils/analytics";
+import { analyticsTrack } from "../utils/trackers";
 
 const GroupItem = ({ service, showPlusButton }) => {
   const [collapse, setCollapse] = useState(false);
@@ -31,7 +31,7 @@ const GroupItem = ({ service, showPlusButton }) => {
     setCollapse(true);
   };
 
-  const openCollapse = () => {
+  const openCollapse = (event) => {
     if (subServices.length === 0) {
       setLoading(true);
       try {
@@ -48,17 +48,23 @@ const GroupItem = ({ service, showPlusButton }) => {
     analyticsTrack({
       objectName: 'Service Expand',
       actionName: 'clicked',
-      screen: 'Home page'
+      screen: 'Home page',
+      properties:{
+        serviceName: event.target.name,
+      }
     })
   };
 
-  const closeCollapse = () => {
+  const closeCollapse = (event) => {
     setCollapse(false);
 
     analyticsTrack({
       objectName: 'Service Collapse',
       actionName: 'clicked',
-      screen: 'Home page'
+      screen: 'Home page',
+      properties:{
+        serviceName: event.target.name,
+      }
     })
   };
 
@@ -76,9 +82,9 @@ const GroupItem = ({ service, showPlusButton }) => {
           {!loading && showPlusButton && (
             <>
               {collapse ? (
-                <button className="square-minus" onClick={closeCollapse} />
+                <button className="square-minus" name={service.name} onClick={closeCollapse} />
               ) : (
-                <button className="square-plus" onClick={openCollapse} />
+                <button className="square-plus" name={service.name} onClick={openCollapse} />
               )}
             </>
           )}
