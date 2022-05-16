@@ -6,9 +6,6 @@ import API from "../config/API";
 import langs from "../config/langs";
 import GroupServiceFailures from "./GroupServiceFailures";
 import SubServiceCard from "./SubServiceCard";
-// import IncidentsBlock from "./IncidentsBlock";
-// import ServiceLoader from "./ServiceLoader";
-// import DateUtils from "../utils/DateUtils";
 import infoIcon from "../static/info.svg";
 import { analyticsTrack } from "../utils/trackers";
 
@@ -17,10 +14,6 @@ const GroupItem = ({ service, showPlusButton }) => {
   const [subServices, setSubServices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hoverText, setHoverText] = useState("");
-
-  // const groupServices = services
-  //   .filter((s) => s.group_id === service.id)
-  //   .sort((a, b) => a.order_id - b.order_id);
 
   const fetchSubServices = async () => {
     const data = await API.fetchSubServices(service.id);

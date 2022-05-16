@@ -10,11 +10,11 @@ export const initLumberjack = () => {
 };
 
 export const analyticsTrack = (trackObj) => {
-  analyticsService.track({
-    ...trackObj,
-    properties: {
-      ...trackObj.properties,
-      userId: getUserId()
-    }
-  })
-}
+	analyticsService.track({
+		...trackObj,
+		properties: {
+			...trackObj.properties,
+			userId: getUserId(),
+		},
+	});
+};
