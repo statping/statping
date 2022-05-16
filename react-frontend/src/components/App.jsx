@@ -8,7 +8,6 @@ import { initLumberjack } from "../utils/trackers";
 import { generateUUID, getUserId, setUerId } from "../utils/helper";
 
 const App = () => {
-  console.log(`Application running on ${process.env.NODE_ENV} mode.`);
   useEffect(() => {
     if(!getUserId()) {
       setUerId(generateUUID(14));
