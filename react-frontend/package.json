@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "env-cmd -f ./configs/dev.env react-scripts start",
-    "build": "rm -rf build && GENERATE_SOURCEMAP=false env-cmd -f ./configs/dev.env react-scripts build",
+    "build": "rm -rf build && GENERATE_SOURCEMAP=false env-cmd -f ./configs/prod.env react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
