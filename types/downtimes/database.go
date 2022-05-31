@@ -74,6 +74,20 @@ func FindLatestDowntimeOfService(service int64) Downtime {
 	return downtime
 }
 
+func (c *Downtime) CheckOverlapping() bool {
+	var downtimes []Downtime
+	q := db.Where("service = ?", c.ServiceId)
+	q = q.Where("\"end\" IS NULL or \"end\" >= ?", c.Start)
+	if c.End != nil {
+		q = q.Where("start <= ?", c.End)
+	}
+	q = q.Find(&downtimes)
+	if len(downtimes) > 0 {
+		return true
+	}
+	return false
+}
+
 func FindAll(vars map[string]string) (*[]Downtime, error) {
 	var downtime []Downtime
 	var start time.Time

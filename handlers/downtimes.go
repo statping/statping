@@ -108,6 +108,12 @@ func apiCreateDowntimeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if downtime.CheckOverlapping() {
+		err := fmt.Errorf("downtime interval overlapping error")
+		sendErrorJson(err, w, r)
+		return
+	}
+
 	s, err := services.FindFirstFromDB(downtime.ServiceId)
 	if err != nil {
 		sendErrorJson(err, w, r)
