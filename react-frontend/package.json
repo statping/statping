@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
-    "build": "rm -rf build && GENERATE_SOURCEMAP=false react-scripts build",
+    "start": "env-cmd -f ./configs/dev.env react-scripts start",
+    "build": "rm -rf build && GENERATE_SOURCEMAP=false env-cmd -f ./configs/prod.env react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -17,16 +17,18 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.15",
+    "@razorpay/universe-utils": "^5.1.2",
     "apexcharts": "^3.28.1",
     "axios": "^0.21.1",
     "date-fns": "^2.23.0",
+    "env-cmd": "^10.1.0",
     "framer-motion": "^4",
     "node-sass": "^6.0.1",
     "react": "^17.0.2",
     "react-apexcharts": "^1.3.9",
     "react-dom": "^17.0.2",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "4.0.3",
+    "react-scripts": "^5.0.1",
     "react-tooltip": "^4.2.21"
   },
   "eslintConfig": {

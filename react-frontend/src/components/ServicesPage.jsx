@@ -12,6 +12,7 @@ import ServiceLoader from "./ServiceLoader";
 import API from "../config/API";
 import { STATUS_COLOR, STATUS_ICON, STATUS_TEXT } from "../utils/constants";
 import { findStatus } from "../utils/helper";
+import { analyticsTrack } from "../utils/trackers";
 
 const ServicesPage = () => {
   // const data = messages.filter((m) => inRange(m) && m.service === 0);
@@ -20,6 +21,16 @@ const ServicesPage = () => {
   const [loading, setLoading] = useState(true);
   const [poll, setPolling] = useState(1);
   const today = DateUtils.format(new Date(), "d MMMM yyyy, hh:mm aaa");
+
+  useEffect(() => {
+    if(!loading) {
+      analyticsTrack({
+        objectName: 'Status Page',
+        actionName: 'displayed',
+        screen: 'Home page'
+      })
+    }
+  }, [loading])
 
   useEffect(() => {
     const timer = setInterval(() => {

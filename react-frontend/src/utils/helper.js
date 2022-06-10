@@ -57,3 +57,15 @@ export const calcPer = (uptime, downtime) => {
 //   });
 //   return arrayStr.join("<br/>");
 // }
+
+export const setUerId = (id) => {
+  localStorage.setItem('stat_user_id',id);
+}
+
+export const getUserId = () => {
+  return localStorage.getItem('stat_user_id');
+}
+
+export const generateUUID = (length) => {
+  return Array.from(Array(length), () => Math.floor(Math.random() * 36).toString(36)).join('')
+}

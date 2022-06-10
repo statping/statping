@@ -1,6 +1,9 @@
-FROM node:12.18.2-alpine AS frontend
+FROM node:16.13.0 AS frontend
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG BUILDPLATFORM
+ARG GITHUB_ACCESS_TOKEN
+
+ENV GITHUB_ACCESS_TOKEN ${GITHUB_ACCESS_TOKEN}
 
 # Build vue frontent
 WORKDIR /statping
@@ -14,6 +17,7 @@ RUN yarn build && yarn cache clean
 WORKDIR /statping-react
 COPY ./react-frontend/package.json .
 COPY ./react-frontend/yarn.lock .
+COPY ./react-frontend/.npmrc .
 RUN yarn install --pure-lockfile --network-timeout 1000000
 COPY ./react-frontend/ .
 RUN yarn build && yarn cache clean
@@ -42,9 +46,9 @@ ENV GO111MODULE on
 ENV CGO_ENABLED 1
 RUN go get github.com/stretchr/testify/assert && \
     go get github.com/stretchr/testify/require && \
-	go get github.com/GeertJohan/go.rice/rice && \
-	go get github.com/cortesi/modd/cmd/modd && \
-	go get github.com/crazy-max/xgo
+    go get github.com/GeertJohan/go.rice/rice && \
+    go get github.com/cortesi/modd/cmd/modd && \
+    go get github.com/crazy-max/xgo
 COPY . .
 COPY --from=frontend /statping/dist/ ./source/dist/
 COPY --from=frontend /statping-react/build/ ./react/build/

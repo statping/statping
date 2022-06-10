@@ -6,20 +6,14 @@ import API from "../config/API";
 import langs from "../config/langs";
 import GroupServiceFailures from "./GroupServiceFailures";
 import SubServiceCard from "./SubServiceCard";
-// import IncidentsBlock from "./IncidentsBlock";
-// import ServiceLoader from "./ServiceLoader";
-// import DateUtils from "../utils/DateUtils";
 import infoIcon from "../static/info.svg";
+import { analyticsTrack } from "../utils/trackers";
 
 const GroupItem = ({ service, showPlusButton }) => {
   const [collapse, setCollapse] = useState(false);
   const [subServices, setSubServices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hoverText, setHoverText] = useState("");
-
-  // const groupServices = services
-  //   .filter((s) => s.group_id === service.id)
-  //   .sort((a, b) => a.order_id - b.order_id);
 
   const fetchSubServices = async () => {
     const data = await API.fetchSubServices(service.id);
@@ -30,7 +24,7 @@ const GroupItem = ({ service, showPlusButton }) => {
     setCollapse(true);
   };
 
-  const openCollapse = () => {
+  const openCollapse = (event) => {
     if (subServices.length === 0) {
       setLoading(true);
       try {
@@ -43,10 +37,28 @@ const GroupItem = ({ service, showPlusButton }) => {
     } else {
       setCollapse(true);
     }
+
+    analyticsTrack({
+      objectName: 'Service Expand',
+      actionName: 'clicked',
+      screen: 'Home page',
+      properties:{
+        serviceName: event.target.name,
+      }
+    })
   };
 
-  const closeCollapse = () => {
+  const closeCollapse = (event) => {
     setCollapse(false);
+
+    analyticsTrack({
+      objectName: 'Service Collapse',
+      actionName: 'clicked',
+      screen: 'Home page',
+      properties:{
+        serviceName: event.target.name,
+      }
+    })
   };
 
   const handleMouseOver = (service) => {
@@ -63,9 +75,9 @@ const GroupItem = ({ service, showPlusButton }) => {
           {!loading && showPlusButton && (
             <>
               {collapse ? (
-                <button className="square-minus" onClick={closeCollapse} />
+                <button className="square-minus" name={service.name} onClick={closeCollapse} />
               ) : (
-                <button className="square-plus" onClick={openCollapse} />
+                <button className="square-plus" name={service.name} onClick={openCollapse} />
               )}
             </>
           )}
