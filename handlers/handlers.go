@@ -172,18 +172,33 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 	if err != nil {
 		log.Errorln(err)
 	}
-	render, err := source.TmplBox.String(file)
-	if err != nil {
-		log.Errorln(err)
+
+	log.Infoln("Ca commence à être intéressant")
+	asset := file
+	if source.UsingAssets(utils.Directory) {
+
+		asset = utils.Directory + "/assets/" + file
+		log.Infoln(fmt.Sprintf("asset : %s", asset))
+
+		if _, err := mainTemplate.ParseFiles(asset); err != nil {
+			log.Errorln(err)
+		}
+	} else {
+		render, err := source.TmplBox.String(asset)
+		if err != nil {
+			log.Errorln(err)
+		}
+		// render the page requested
+		if _, err := mainTemplate.Parse(render); err != nil {
+			log.Errorln(err)
+		}
 	}
-	// render the page requested
-	if _, err := mainTemplate.Parse(render); err != nil {
-		log.Errorln(err)
-	}
+	log.Infoln("step 3")
 	// execute the template
 	if err := mainTemplate.Execute(w, data); err != nil {
 		log.Errorln(err)
 	}
+	log.Infoln("step 4")
 }
 
 func returnJson(d interface{}, w http.ResponseWriter, r *http.Request) {

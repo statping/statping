@@ -30,6 +30,7 @@ var (
 		"scss/mobile.scss",
 		"scss/variables.scss",
 		"robots.txt",
+		"base.gohtml",
 	}
 )
 
@@ -87,6 +88,7 @@ func CompileSASS() error {
 
 // UsingAssets returns true if the '/assets' folder is found in the directory
 func UsingAssets(folder string) bool {
+	log.Infoln(fmt.Sprintf("using assets? checking %s", folder))
 	if _, err := os.Stat(folder + "/assets"); err == nil {
 		return true
 	} else {
@@ -174,7 +176,7 @@ func DeleteAllAssets(folder string) error {
 // CopyAllToPublic will copy all the files in a rice box into a local folder
 func CopyAllToPublic(box *rice.Box) error {
 	exclude := map[string]bool{
-		"base.gohtml": true,
+		// "base.gohtml": true,
 		"index.html":  true,
 	}
 
