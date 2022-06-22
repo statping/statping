@@ -88,7 +88,6 @@ func CompileSASS() error {
 
 // UsingAssets returns true if the '/assets' folder is found in the directory
 func UsingAssets(folder string) bool {
-	log.Infoln(fmt.Sprintf("using assets? checking %s", folder))
 	if _, err := os.Stat(folder + "/assets"); err == nil {
 		return true
 	} else {
