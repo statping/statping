@@ -37,7 +37,7 @@ const czech = {
     type: "Typ",
     edit: "Upravit",
     update: "Aktualizovat",
-    create: "Vytvořot",
+    create: "Vytvořit",
     view: "Zobrazit",
     save: "Uložit",
     title: "Název",
