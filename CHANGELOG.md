@@ -1,3 +1,14 @@
+# 0.90.80 (01-26-2022)
+- Fixed permissions on /app directory - Thanks twouters
+
+# 0.90.79 (01-24-2022)
+- Updated Russian Language - Thanks meatlayer
+- Docker file fix for BASE_PATH and health checks - Thanks michaelkrieger
+- Removed statping emailer notifier (not SMTP Mail)
+- Fixes for notification failures (Issue statping#911) - Thanks glanchow
+- Updated Home page uptime wording (24hr/7days) - Thanks Jonathanrbarney & thatInfrastructureGuy
+- [GITHUB] Removed mailer tests
+
 # 0.90.78 (09-15-2021)
 - HTTP Webhooks accept multiple HTTP Headers
 - Modified Telegram notifier to allow chat_ids
