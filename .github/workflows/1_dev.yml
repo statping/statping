@@ -63,7 +63,7 @@ jobs:
         arch: [386, amd64, arm-7, arm-6, arm64]
         include:
           - platform: darwin
-            arch: arm64
+            arch: 386
           - platform: darwin
             arch: amd64
           - platform: windows
