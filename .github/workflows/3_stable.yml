@@ -76,6 +76,8 @@ jobs:
         arch: [386, amd64, arm-7, arm-6, arm64]
         include:
           - platform: darwin
+            arch: arm64
+          - platform: darwin
             arch: amd64
           - platform: windows
             arch: 386
@@ -110,7 +112,7 @@ jobs:
           echo "XGO_TAGS=netgo osusergo linux sqlite_omit_load_extension" >> $GITHUB_ENV
         shell: bash
 
-      - name: Set Darwin Build Flags
+      - name: Set MacOS (Darwin) Build Flags
         if: matrix.platform == 'darwin'
         run: echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
         shell: bash
@@ -154,17 +156,17 @@ jobs:
         if: matrix.platform == 'windows'
         run: |
           cd build
-          mv statping-windows-4.0-${{ matrix.arch }}.exe statping.exe
+          mv statping-windows-${{ matrix.arch }}.exe statping.exe
           chmod +x statping.exe
           zip statping-windows-${{ matrix.arch }}.zip statping.exe
           rm -rf statping.exe
           echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
 
-      - name: Compress Darwin Builds
+      - name: Compress MacOS (Darwin) Builds
         if: matrix.platform == 'darwin'
         run: |
           cd build
-          mv statping-darwin-10.12-${{ matrix.arch }} statping
+          mv statping-darwin-${{ matrix.arch }} statping
           chmod +x statping
           tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
           rm -rf statping
