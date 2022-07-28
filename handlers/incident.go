@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/incidents"
@@ -75,11 +76,17 @@ func apiCreateIncidentHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
+	fmt.Println("c1")
 	incident.ServiceId = service.Id
+	fmt.Println("c2")
+	fmt.Println(incident)
 	if err := incident.Create(); err != nil {
+		fmt.Println("c3")
 		sendErrorJson(err, w, r)
 		return
 	}
+	fmt.Println("c4")
+	fmt.Println(incident)
 	sendJsonAction(incident, "create", w, r)
 }
 
