@@ -14,10 +14,10 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
-          go-version: 1.15.x
+          go-version: 1.17.x
       - uses: actions/setup-node@v1
         with:
-          node-version: 12.18.2
+          node-version: 16.14.0
 
       - name: Set Version
         run: |
@@ -63,7 +63,7 @@ jobs:
         arch: [386, amd64, arm-7, arm-6, arm64]
         include:
           - platform: darwin
-            arch: 386
+            arch: arm64
           - platform: darwin
             arch: amd64
           - platform: windows
@@ -92,7 +92,7 @@ jobs:
           echo "XGO_TAGS=netgo osusergo linux sqlite_omit_load_extension" >> $GITHUB_ENV
         shell: bash
 
-      - name: Set Darwin Build Flags
+      - name: Set MacOS (Darwin) Build Flags
         if: matrix.platform == 'darwin'
         run : |
           echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
@@ -112,7 +112,7 @@ jobs:
           COMMIT: ${{ github.sha }}
         with:
           xgo_version: latest
-          go_version: 1.15.x
+          go_version: 1.17.x
           dest: build
           prefix: statping
           targets: ${{ matrix.platform }}/${{ matrix.arch }}
@@ -137,42 +137,21 @@ jobs:
         if: matrix.platform == 'windows'
         run: |
           cd build
-          mv statping-windows-4.0-${{ matrix.arch }}.exe statping.exe
+          mv statping-windows-${{ matrix.arch }}.exe statping.exe
           chmod +x statping.exe
           zip statping-windows-${{ matrix.arch }}.zip statping.exe
           rm -rf statping.exe
           echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
 
-      - name: Compress Darwin 32bit Builds
-        if: matrix.platform == 'darwin' && matrix.arch == '386'
+      - name: Compress MacOS (Darwin) Builds
+        if: matrix.platform == 'darwin'
         run: |
           cd build
-          ls >> $GITHUB_ENV
-#          mv statping-darwin-10.6-${{ matrix.arch }} statping
-#          chmod +x statping
-#          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz *
-#          rm -rf statping
-#          echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
-
-      - name: Compress Darwin 64bit Builds
-        if: matrix.platform == 'darwin' && matrix.arch == 'amd64'
-        run: |
-          cd build
-          mv statping-darwin-10.12-${{ matrix.arch }} statping
+          mv statping-darwin-${{ matrix.arch }} statping
           chmod +x statping
-          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
+          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz *
           rm -rf statping
           echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
-
-#      - name: Compress Darwin arm64 Builds
-#        if: matrix.platform == 'darwin' && matrix.arch == 'arm64'
-#        run: |
-#          cd build
-#          mv statping-darwin-10.15-${{ matrix.arch }} statping
-#          chmod +x statping
-#          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
-#          rm -rf statping
-#          echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
 
       - name: Upload Compiled Statping Binary
         uses: actions/upload-artifact@v1
@@ -207,10 +186,10 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
-          go-version: 1.15.x
+          go-version: 1.17.x
       - uses: actions/setup-node@v1
         with:
-          node-version: 12.18.2
+          node-version: 16.14.0
 
       - name: Install Global Dependencies
         run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
@@ -218,7 +197,7 @@ jobs:
       - name: Setting ENV's
         run: |
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+          echo "/opt/hostedtoolcache/node/16.14.0/x64/bin" >> $GITHUB_PATH
           echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
         shell: bash
 
@@ -262,7 +241,7 @@ jobs:
           MOBILE_NUMBER: ${{ secrets.MOBILE_NUMBER }}
           PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
           PUSHOVER_API: ${{ secrets.PUSHOVER_API }}
-          SLACK_URL: ${{ secrets.SLACK_URL }}
+          SLACK_URL: https://hooks.slack.com/services/TTJ1B90DP/RENU20O9M/9uI823SUnYBuGcxYlpSimD6H
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
           TWILIO_SID: ${{ secrets.TWILIO_SID }}
@@ -277,12 +256,12 @@ jobs:
           SNS_REGION: ${{ secrets.SNS_REGION }}
           SNS_TOPIC: ${{ secrets.SNS_TOPIC }}
 
-      - name: Coveralls Testing Coverage
-        run: |
-          go get github.com/mattn/goveralls
-          goveralls -coverprofile=coverage.out -repotoken $COVERALLS
-        env:
-          COVERALLS: ${{ secrets.COVERALLS }}
+#      - name: Coveralls Testing Coverage
+#        run: |
+#          go get github.com/mattn/goveralls
+#          goveralls -coverprofile=coverage.out -repotoken $COVERALLS
+#        env:
+#          COVERALLS: ${{ secrets.COVERALLS }}
 
   test-postman-sqlite:
     needs: frontend
@@ -291,12 +270,12 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
-          go-version: 1.15.x
+          go-version: 1.17.x
 
       - name: Setting ENV's
         run: |
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+          echo "/opt/hostedtoolcache/node/16.14.0/x64/bin" >> $GITHUB_PATH
           echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
         shell: bash
 
@@ -345,12 +324,12 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
-          go-version: 1.15.x
+          go-version: 1.17.x
 
       - name: Setting ENV's
         run: |
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+          echo "/opt/hostedtoolcache/node/16.14.0/x64/bin" >> $GITHUB_PATH
           echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
         shell: bash
 
@@ -402,12 +381,12 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
-          go-version: 1.15.x
+          go-version: 1.17.x
 
       - name: Setting ENV's
         run: |
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+          echo "/opt/hostedtoolcache/node/16.14.0/x64/bin" >> $GITHUB_PATH
           echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
         shell: bash
 
