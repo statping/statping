@@ -54,104 +54,105 @@ jobs:
           name: static-rice-box
           path: ./source
 
-build:
-  needs: frontend
-  runs-on: ubuntu-latest
-  strategy:
-    matrix:
-      platform: [linux]
-      arch: [386, amd64, arm-7, arm-6, arm64]
-      include:
-        - platform: darwin
-          arch: arm64
-        - platform: darwin
-          arch: amd64
-        - platform: windows
-          arch: 386
-        - platform: windows
-          arch: amd64
+  build:
+    needs: frontend
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [linux]
+        arch: [386, amd64, arm-7, arm-6, arm64]
+        include:
+          - platform: darwin
+            arch: arm64
+          - platform: darwin
+            arch: amd64
+          - platform: windows
+            arch: 386
+          - platform: windows
+            arch: amd64
 
-  steps:
-    - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
 
-    - name: Download Compiled Frontend (rice-box.go)
-      uses: actions/download-artifact@v1
-      with:
-        name: static-rice-box
-        path: ./source
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
 
-    - name: Add GOBIN to PATH
-      run: |
-        echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
-      shell: bash
+      - name: Add GOBIN to PATH
+        run: |
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        shell: bash
 
-    - name: Set Linux Build Flags
-      if: matrix.platform == 'linux'
-      run: |
-        echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
-        echo "XGO_TAGS=netgo osusergo linux sqlite_omit_load_extension" >> $GITHUB_ENV
-      shell: bash
+      - name: Set Linux Build Flags
+        if: matrix.platform == 'linux'
+        run: |
+          echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
+          echo "XGO_TAGS=netgo osusergo linux sqlite_omit_load_extension" >> $GITHUB_ENV
+        shell: bash
 
-    - name: Set MacOS (Darwin) Build Flags
-      if: matrix.platform == 'darwin'
-      run : |
-        echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
-      shell: bash
+      - name: Set MacOS (Darwin) Build Flags
+        if: matrix.platform == 'darwin'
+        run : |
+          echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
+        shell: bash
 
-    - name: Set Windows Build Flags
-      if: matrix.platform == 'windows'
-      run: |
-        echo "BUILD_FLAGS=-extldflags -static -buildmode=exe" >> $GITHUB_ENV
-        echo "XGO_TAGS=netgo osusergo sqlite_omit_load_extension" >> $GITHUB_ENV
-      shell: bash
+      - name: Set Windows Build Flags
+        if: matrix.platform == 'windows'
+        run: |
+          echo "BUILD_FLAGS=-extldflags -static -buildmode=exe" >> $GITHUB_ENV
+          echo "XGO_TAGS=netgo osusergo sqlite_omit_load_extension" >> $GITHUB_ENV
+        shell: bash
 
-    - name: Build ${{ matrix.platform }}/${{ matrix.arch }}
-      uses: crazy-max/ghaction-xgo@v1
-      env:
-        VERSION: ${{ env.VERSION }}
-        COMMIT: ${{ github.sha }}
-      with:
-        xgo_version: latest
-        go_version: 1.17.x
-        dest: build
-        prefix: statping
-        targets: ${{ matrix.platform }}/${{ matrix.arch }}
-        v: true
-        x: true
-        pkg: cmd
-        buildmode: pie
-        tags: ${{ env.XGO_TAGS }}
-        ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} ${{ env.BUILD_FLAGS }}
+      - name: Build ${{ matrix.platform }}/${{ matrix.arch }}
+        uses: crazy-max/ghaction-xgo@v1
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
+        with:
+          xgo_version: latest
+          go_version: 1.17.x
+          dest: build
+          prefix: statping
+          targets: ${{ matrix.platform }}/${{ matrix.arch }}
+          v: true
+          x: true
+          pkg: cmd
+          buildmode: pie
+          tags: ${{ env.XGO_TAGS }}
+          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} ${{ env.BUILD_FLAGS }}
 
-    - name: Compress Linux Builds
-      if: matrix.platform == 'linux'
-      run: |
-        cd build
-        mv statping-linux-${{ matrix.arch }} statping
-        chmod +x statping
-        tar -czvf statping-linux-${{ matrix.arch }}.tar.gz statping
-        rm -rf statping
-        echo "compressed=statping-linux-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
+      - name: Compress Linux Builds
+        if: matrix.platform == 'linux'
+        run: |
+          cd build
+          mv statping-linux-${{ matrix.arch }} statping
+          chmod +x statping
+          tar -czvf statping-linux-${{ matrix.arch }}.tar.gz statping
+          rm -rf statping
+          echo "compressed=statping-linux-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
 
-    - name: Compress Windows Builds
-      if: matrix.platform == 'windows'
-      run: |
-        cd build
-        mv statping-windows-${{ matrix.arch }}.exe statping.exe
-        chmod +x statping.exe
-        zip statping-windows-${{ matrix.arch }}.zip statping.exe
-        rm -rf statping.exe
-        echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
+      - name: Compress Windows Builds
+        if: matrix.platform == 'windows'
+        run: |
+          cd build
+          mv statping-windows-${{ matrix.arch }}.exe statping.exe
+          chmod +x statping.exe
+          zip statping-windows-${{ matrix.arch }}.zip statping.exe
+          rm -rf statping.exe
+          echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
 
-    - name: Compress MacOS (Darwin) Builds
-      if: matrix.platform == 'darwin'
-      run: |
-        cd build
-        mv statping-darwin-${{ matrix.arch }} statping
-        chmod +x statping
-        tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz *
-        rm -rf statping
-        echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
+      - name: Compress MacOS (Darwin) Builds
+        if: matrix.platform == 'darwin'
+        run: |
+          cd build
+          mv statping-darwin-${{ matrix.arch }} statping
+          chmod +x statping
+          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz *
+          rm -rf statping
+          echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
+
       - name: Upload Compiled Statping Binary
         uses: actions/upload-artifact@v1
         with:
@@ -169,7 +170,6 @@ build:
           draft: true
           prerelease: true
           files: build/${{ env.compressed }}
-
 
 #  test:
 #    needs: frontend
