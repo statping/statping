@@ -94,12 +94,13 @@
                 <div class="col-sm-8">
                     <select v-model="service.method" name="method" class="form-control">
                         <option value="GET" >GET</option>
+                        <option value="HEAD" >HEAD</option>
                         <option value="POST" >POST</option>
                         <option value="DELETE" >DELETE</option>
                         <option value="PATCH" >PATCH</option>
                         <option value="PUT" >PUT</option>
                     </select>
-                    <small class="form-text text-muted">A GET request will simply request the endpoint, you can also send data with POST.</small>
+                    <small class="form-text text-muted">A GET/HEAD request will simply request the endpoint, you can also send data with POST.</small>
                 </div>
             </div>
 
