@@ -275,7 +275,7 @@ class Api {
   }
 
   async github_release() {
-    return fetch('https://api.github.com/repos/statping/statping/releases/latest').then(response => response.json())
+    return fetch('https://api.github.com/repos/statping-ng/statping-ng/releases/latest').then(response => response.json())
   }
 
   async allActions(...all) {
