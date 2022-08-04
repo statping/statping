@@ -1,7 +1,7 @@
 <template>
     <form @submit.prevent="saveSettings">
     <div class="card">
-        <div class="card-header">Statping Settings</div>
+        <div class="card-header">Statping-ng Settings</div>
         <div class="card-body">
                 <div class="form-group">
                     <label>{{ $t('project_name') }}</label>

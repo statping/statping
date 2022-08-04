@@ -46,7 +46,7 @@
                         </a>
                     </div>
 
-                    <h6 class="mt-4 mb-3 text-muted">Statping {{$t('links')}}</h6>
+                    <h6 class="mt-4 mb-3 text-muted">Statping-ng {{$t('links')}}</h6>
 
                     <a href="https://statping-ng.github.io" class="mb-2 font-2 text-decoration-none text-muted">
                         <font-awesome-icon icon="globe" class="mr-3"/> Statping-ng
@@ -68,7 +68,7 @@
                         <font-awesome-icon icon="code-branch" class="mr-3"/> {{$t('repo')}}
                     </a>
 
-                  <span class="small text-dim text-center mt-5">Statping v{{core.version}}<br>
+                  <span class="small text-dim text-center mt-5">Statping-ng v{{core.version}}<br>
                     <a class="small text-muted no-decoration" v-if="core.commit" v-bind:href="`https://github.com/statping-ng/statping-ng/commit/${core.commit}`">{{core.commit.slice(0,8)}}</a>
                   </span>
 
