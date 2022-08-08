@@ -18,3 +18,8 @@ jobs:
     uses: razorpay/security-action/.github/workflows/status_check.yml@master
     with:
       WORKFLOW_RESULT: ${{ needs.security-sast.result == 'success' && needs.security-sast.result != 'cancelled' || 'false' }}
+
+  scan-dependencies:
+    uses: razorpay/security-action/.github/workflows/dependency-scanner.yml@master
+    with:
+      DEPENDABOT_PATH: ".github/dependabot.yml"
