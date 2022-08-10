@@ -41,7 +41,7 @@ export default {
               return "badge-success"
             case "update":
               return "badge-info"
-            case "investigating":
+            case "issue summary":
               return "badge-danger"
           }
         },

@@ -1,5 +1,4 @@
 import React from "react";
-// import { groups } from "../utils/data";
 import GroupItem from "./GroupItem";
 import { isObject, isObjectEmpty } from "../utils/helper";
 
@@ -17,9 +16,6 @@ function showPlus(service) {
 }
 
 const Group = ({ services }) => {
-  // const data = groups.sort((a, b) => a.order_id - b.order_id);
-  // if (!data.length > 0) return <></>;
-
   return (
     <div className="list-group">
       {services?.map((service) => {

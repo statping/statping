@@ -213,10 +213,15 @@ class Api {
   }
 
   async incidents_service(id) {
-    return incidents[id];
-    // return axios
-    //   .get("api/services/" + id + "/incidents")
-    //   .then((response) => response.data);
+    return axios
+      .get("/services/" + id + "/active_incidents")
+      .then((response) => response.data);
+  }
+
+  async sub_incidents_service(id, sub_id) {
+    return axios
+      .get(`/services/${id}/sub_services/${sub_id}/active_incidents`)
+      .then((response) => response.data);
   }
 
   async incident_create(service_id, data) {

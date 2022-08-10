@@ -57,12 +57,6 @@ async function fetchFailureSeries(url) {
 }
 
 const GroupServiceFailures = ({ group = null, service, collapse }) => {
-  // const [containerRef, isVisible] = useIntersectionObserver({
-  //   root: null,
-  //   rootMargin: "0px",
-  //   threshold: 1.0,
-  // });
-
   const [hoverText, setHoverText] = useState("");
   const [loaded, setLoaded] = useState(true);
   const [failureData, setFailureData] = useState([]);
@@ -98,7 +92,7 @@ const GroupServiceFailures = ({ group = null, service, collapse }) => {
       }
     }
     fetchData();
-  }, [service]);
+  }, [service, group]);
 
   const handleTooltip = (d) => {
     let txt = "";
@@ -133,7 +127,6 @@ const GroupServiceFailures = ({ group = null, service, collapse }) => {
   if (loaded) return <ServiceLoader text="Loading series.." />;
 
   return (
-    // transition div
     <div name="fade" style={{ display: collapse ? "none" : "block" }}>
       <div className="block-chart">
         <ReactTooltip
@@ -150,8 +143,7 @@ const GroupServiceFailures = ({ group = null, service, collapse }) => {
                 onMouseOver={() => handleMouseOver(d)}
                 onMouseOut={handleMouseOut}
                 key={i}
-                data-tip={hoverText}
-              >
+                data-tip={hoverText}>
                 {d.status !== 0 && (
                   <span className="d-none d-md-block text-center small"></span>
                 )}

@@ -13,6 +13,48 @@ a {
   color: $text-color;
 }
 
+.dot {
+  height: 8px;
+  width: 8px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.square-plus,
+.square-minus {
+  color: $blue;
+  border: 2px solid $blue;
+  border-radius: 2px;
+  width: 14px;
+  height: 14px;
+  font-size: 8px;
+  margin-right: 5px;
+  position: relative;
+  background-color: $white;
+  outline: none;
+  padding: 0;
+  cursor: pointer;
+
+  &:after {
+    font-size: 12px;
+    line-height: 10px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+  }
+}
+
+.square-plus:after {
+  content: "+";
+}
+
+.square-minus:after {
+  content: "-";
+}
+
 .app-layout {
   background: $primary-bg;
   min-width: 100vw;
@@ -116,25 +158,73 @@ a {
   transition-duration: 300ms;
 }
 
-.service-card {
-  position: relative;
-  min-height: 130px;
-  padding: 1.25rem 0;
-  background-color: $white;
+.list-group .service-parent {
+  border-radius: 4px;
+  margin-bottom: 1rem;
   border: 1px solid #eff2f7;
-  border-bottom-width: 0;
-  overflow: hidden;
+
+  .sub-service-wrapper {
+    border-top: 1px solid #eff2f7;
+
+    .service-card {
+      &:last-child {
+        padding-bottom: 0;
+      }
+    }
+  }
 }
 
-.list-group .service-card:first-child {
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
+.service-card {
+  position: relative;
+  padding: 1.25rem 0;
+  background-color: $white;
+  overflow: hidden;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #eff2f7;
+  }
+
+  .incidents-wrapper {
+    .incident-title {
+      display: flex;
+
+      .title-wrapper {
+        flex: 1;
+      }
+
+      .square-plus,
+      .square-minus {
+        top: 5px;
+      }
+    }
+
+    .incident-updates-wrapper {
+      margin-left: 3px;
+
+      .incident-wrapper {
+        position: relative;
+        margin-right: 3px;
+
+        &:not(:last-child):after {
+          content: "";
+          height: 100%;
+          width: 1px;
+          top: 21px;
+          left: 3px;
+          background-color: #bbb;
+          position: absolute;
+        }
+
+        &:last-child {
+          margin-bottom: 0 !important;
+        }
+      }
+    }
+  }
 }
 
 .list-group .service-card:last-child {
-  border-bottom-right-radius: 4px;
-  border-bottom-left-radius: 4px;
-  border-bottom-width: 1px;
+  margin-bottom: 0;
 }
 
 .service-card a {
@@ -157,40 +247,6 @@ a {
   &--right {
     display: flex;
     align-items: center;
-
-    .square-plus,
-    .square-minus {
-      color: $blue;
-      border: 2px solid $blue;
-      border-radius: 2px;
-      width: 14px;
-      height: 14px;
-      font-size: 8px;
-      margin-right: 5px;
-      position: relative;
-      background-color: $white;
-      outline: none;
-      padding: 0;
-      cursor: pointer;
-
-      &:after {
-        font-size: 12px;
-        line-height: 10px;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-weight: bold;
-      }
-    }
-
-    .square-plus:after {
-      content: "+";
-    }
-
-    .square-minus:after {
-      content: "-";
-    }
   }
 }
 
@@ -353,10 +409,12 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 15px;
+
   .service-status {
     display: flex;
     align-items: center;
-    margin-right: 1.875rem;
 
     &-badge {
       width: 0.75rem;

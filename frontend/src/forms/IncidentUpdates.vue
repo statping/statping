@@ -12,9 +12,8 @@
         <form class="row" @submit.prevent="createIncidentUpdate">
             <div class="col-12 col-md-3 mb-3 mb-md-0">
                 <select v-model="incident_update.type" class="form-control">
-                    <option value="Investigating">Investigating</option>
+                    <option value="Issue summary">Issue summary</option>
                     <option value="Update">Update</option>
-                    <option value="Unknown">Unknown</option>
                     <option value="Resolved">Resolved</option>
                 </select>
             </div>
@@ -53,7 +52,7 @@
                 incident_update: {
                     incident: this.incident.id,
                     message: "",
-                    type: "Investigating" // TODO: default to something.. theres is no error checking for blank submission...
+                    type: "Issue summary"
                 }
             }
         },
@@ -74,7 +73,7 @@
                 this.incident_update = {
                     incident: this.incident.id,
                     message: "",
-                    type: "Investigating"
+                    type: "Issue summary"
                 }
 
             },

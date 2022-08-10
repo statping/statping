@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ReactTooltip from "react-tooltip";
 import langs from "../config/langs";
 import GroupServiceFailures from "./GroupServiceFailures";
-// import IncidentsBlock from "./IncidentsBlock";
+import IncidentsBlock from "./IncidentsBlock";
 import infoIcon from "../static/info.svg";
 
 const SubServiceCard = ({ group, service }) => {
@@ -50,15 +50,14 @@ const SubServiceCard = ({ group, service }) => {
           <span
             className={`badge float-right font-12 ${
               service.online ? "status-green" : "status-red"
-            }`}
-          >
+            }`}>
             {service.online ? langs("online") : langs("offline")}
           </span>
         </div>
       </div>
 
       <GroupServiceFailures group={group} service={service} />
-      {/* <IncidentsBlock service={service} /> */}
+      <IncidentsBlock group={group} service={service} />
     </div>
   );
 };
