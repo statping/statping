@@ -53,8 +53,8 @@
           :key="downtime.id"
         >
           <td>
-            <span>
-              {{ downtime.service.name }}
+            <span :class="{'text-danger': !downtime.service}">
+              {{ (downtime.service && downtime.service.name) || 'Deleted service' }}
             </span>
           </td>
           <td class="d-none d-md-table-cell">
@@ -65,16 +65,14 @@
             </span>
           </td>
           <td class="d-none d-md-table-cell">
-            <span
-              class=""
-            >
+            <span>
               {{ downtime.end ? niceDateWithYear(downtime.end) : 'Ongoing' }}
             </span>
           </td>
           <td class="d-none d-md-table-cell">
             <span
               class="badge text-uppercase"
-              :class="[downtime.sub_status === 'down' ? 'badge-danger' : 'badge-warning' ]"
+              :class="[downtime.sub_status === 'down' ? 'badge-danger' : 'badge-warning']"
             >
               {{ downtime.sub_status }}
             </span>
@@ -87,7 +85,7 @@
             </span>
           </td>
           <td class="text-right">
-            <div class="btn-group">
+            <div v-if="downtime.service" class="btn-group">
               <button
                 v-if="$store.state.admin"
                 :disabled="isLoading"

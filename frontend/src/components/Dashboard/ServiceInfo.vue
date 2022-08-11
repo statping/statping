@@ -1,9 +1,9 @@
 <template>
     <div class="dashboard_card card mb-4" :class="{'offline-card': !service.online}">
         <div class="card-header pb-1">
-            <h6 v-observe-visibility="setVisible">
+            <h6 v-observe-visibility="setVisible" class="d-flex align-items-baseline justify-content-between">
                 <router-link :to="serviceLink(service)" class="no-decoration">{{service.name}}</router-link>
-                <span class="badge float-right text-uppercase" :class="{'badge-success': service.online, 'badge-danger': !service.online}">
+                <span class="badge text-uppercase" :class="{'badge-success': service.online, 'badge-danger': !service.online}">
                     {{service.online ? $t('online') : $t('offline')}}
                 </span>
             </h6>
@@ -44,7 +44,7 @@
                     <font-awesome-icon icon="calendar-check"/>
                   </button>
                   <button @click="$router.push({path: `/dashboard/service/${service.id}/failures`, params: {id: service.id}})" @mouseleave="unsetHover" @mouseover="setHover($t('failures'))" class="btn btn-sm btn-white failures">
-                    <font-awesome-icon icon="exclamation-triangle"/> <span v-if="service.stats.failures !== 0" class="badge badge-danger ml-1">{{service.stats.failures}}</span>
+                    <font-awesome-icon icon="exclamation-triangle"/><span v-if="service.stats && service.stats.failures !== 0" class="badge badge-danger ml-1">{{service.stats.failures}}</span>
                   </button>
               </div>
             </div>

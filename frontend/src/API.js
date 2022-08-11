@@ -148,6 +148,10 @@ class Api {
     return axios.post('api/services/' + service_id + '/incidents', data).then(response => (response.data))
   }
 
+  async incident_edit(incident_id, data) {
+    return axios.patch('api/incidents/' + incident_id, data).then(response => (response.data))
+  }
+
   async incident_delete(incident) {
     return axios.delete('api/incidents/' + incident.id).then(response => (response.data))
   }

@@ -3,9 +3,15 @@
 
         <div v-for="incident in incidents" :key="incident.id" class="card contain-card mb-4">
             <div class="card-header">Incident: {{incident.title}}
-                <button @click="deleteIncident(incident)" class="btn btn-sm btn-danger float-right">
-                    <font-awesome-icon icon="times" />
-                </button>
+                <div v-if="$store.state.admin" class="btn-group float-right">
+                  <button @click.prevent="editIncident(incident)" class="btn btn-sm btn-outline-secondary" type="button">
+                      <FontAwesomeIcon icon="edit" />
+                  </button>
+                  <button @click.prevent="deleteIncident(incident)" class="btn btn-sm btn-danger" type="button" :disabled="incidentId === incident.id && isLoading">
+                    <FontAwesomeIcon v-if="incidentId === incident.id && isLoading" icon="circle-notch" spin />
+                    <FontAwesomeIcon v-else icon="trash" />
+                  </button>
+                </div>
             </div>
 
             <FormIncidentUpdates :incident="incident"/>
@@ -15,9 +21,16 @@
 
 
         <div class="card contain-card">
-            <div class="card-header">Create Incident</div>
+            <div class="card-header">{{incident.id ? `${$t('update')} ${incident.title}` : $t('incident_create')}}
+                <transition name="slide-fade">
+                    <button @click="resetIncident" v-if="incident.id" class="btn btn-sm float-right btn-danger btn-sm">
+                        {{ $t('cancel') }}
+                    </button>
+                </transition>
+            </div>
+
             <div class="card-body">
-                <form @submit.prevent="createIncident">
+                <form @submit.prevent="saveMessage">
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Title</label>
                         <div class="col-sm-8">
@@ -34,10 +47,11 @@
 
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <button @click.prevent="createIncident"
-                                    :disabled="!incident.title || !incident.description"
+                            <button @click.prevent="saveMessage"
+                                    :disabled="!incident.title || !incident.description || isLoading"
                                     type="submit" class="btn btn-block btn-primary">
-                                Create Incident
+                                {{incident.id ? $t('incident_edit') : $t('incident_create')}}
+                                <FontAwesomeIcon v-if="isLoading" icon="circle-notch" spin />
                             </button>
                         </div>
                     </div>
@@ -54,20 +68,22 @@ import Api from "../../API";
 
 const FormIncidentUpdates = () => import(/* webpackChunkName: "dashboard" */ '@/forms/IncidentUpdates')
 
-    export default {
-        name: 'Incidents',
-        components: {FormIncidentUpdates},
-        data() {
-            return {
-                serviceID: 0,
-                incidents: [],
-                incident: {
-                    title: "",
-                    description: "",
-                    service: 0,
-                  }
-              }
-          },
+export default {
+    name: 'Incidents',
+    components: {FormIncidentUpdates},
+    data() {
+        return {
+            serviceID: 0,
+            incidents: [],
+            isLoading: false,
+            incidentId: null,
+            incident: {
+                title: "",
+                description: "",
+                service: 0,
+            }
+        }
+    },
 
     created() {
         this.serviceID = Number(this.$route.params.id);
@@ -80,13 +96,19 @@ const FormIncidentUpdates = () => import(/* webpackChunkName: "dashboard" */ '@/
 
     methods: {
 
-      async delete(i) {
-        this.res = await Api.incident_delete(i)
-        if (this.res.status === "success") {
-          this.incidents = this.incidents.filter(obj => obj.id !== i.id);
-          //await this.loadIncidents()
-        }
-      },
+        async delete(i) {
+            this.isLoading = true;
+            this.incidentId = i.id;
+
+            this.res = await Api.incident_delete(i)
+            if (this.res.status === "success") {
+                this.incidents = this.incidents.filter(obj => obj.id !== i.id);
+            }
+
+            this.isLoading = false;
+            this.incidentId = null;
+        },
+
         async deleteIncident(incident) {
           const modal = {
             visible: true,
@@ -99,23 +121,62 @@ const FormIncidentUpdates = () => import(/* webpackChunkName: "dashboard" */ '@/
           this.$store.commit("setModal", modal)
         },
 
+        async saveMessage() {
+            if (this.incident.id) {
+                this.updateIncident();
+            } else {
+                this.createIncident();
+            }
+        },
+
         async createIncident() {
-            this.res = await Api.incident_create(this.serviceID, this.incident)
-            if (this.res.status === "success") {
-                this.incidents.push(this.res.output) // this is better in terms of not having to querry the db to get a fresh copy of all updates
+            this.isLoading = true;
+
+            const res = await Api.incident_create(this.serviceID, this.incident)
+            if (res.status === "success") {
+                this.incidents.push(res.output) // this is better in terms of not having to querry the db to get a fresh copy of all updates
                 //await this.loadIncidents()
             } // TODO: further error checking here... maybe alert user it failed with modal or so
 
-            // reset the form data
-            this.incident = {
-                title: "",
-                description: "",
-                service: this.serviceID,
+            this.resetIncident();
+            this.isLoading = false;
+        },
+
+        async updateIncident() {
+            const {id, title, description} = this.incident;
+            
+            this.isLoading = true;
+            const res = await Api.incident_edit(id, {title, description});
+            if (res.status === "success") {
+                this.incidents = this.incidents.map(incident => {
+                    if(incident.id === id) {
+                        return res.output
+                    }
+
+                    return incident;
+                });
+
+                this.resetIncident();
             }
+
+            this.isLoading = false;
+        },
+
+        editIncident(incident) {
+            this.incident = incident;
         },
 
         async loadIncidents() {
             this.incidents = await Api.incidents_service(this.serviceID)
+        },
+
+        resetIncident() {
+            // reset the form data
+            this.incident = {
+                title: "",
+                description: "",
+                service: 0,
+            }
         }
 
     }

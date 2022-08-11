@@ -18,6 +18,7 @@ const english = {
   name: "Name",
   copy: "Copy",
   close: "Close",
+  cancel: "Cancel",
   secret: "Secret",
   regen_api: "Regenerate API Keys",
   regen_desc:
@@ -119,6 +120,8 @@ const english = {
   administrator: "Administrator",
   checkins: "Checkins",
   incidents: "Incidents",
+  incident_create: 'Create Incident',
+  incident_edit: 'Edit Incident',
   service_info: "Service Info",
   service_name: "Service Name",
   service_description: "Service Description",
