@@ -152,7 +152,7 @@ jobs:
           tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz *
           rm -rf statping
           echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
-
+          
       - name: Upload Compiled Statping Binary
         uses: actions/upload-artifact@v1
         with:
