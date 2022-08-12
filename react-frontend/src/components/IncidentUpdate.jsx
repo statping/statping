@@ -18,7 +18,7 @@ const IncidentUpdate = ({ update, admin }) => {
   return (
     <div className="incident-wrapper mb-3 pb-2 d-flex" role="alert">
       <div className="time-line mr-2">
-        <span class="dot"></span>
+        <span className="dot"></span>
       </div>
 
       <div>

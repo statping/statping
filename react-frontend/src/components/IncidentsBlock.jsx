@@ -35,7 +35,7 @@ const IncidentsBlock = ({ service, group }) => {
           incidents?.map((incident) => {
             const { id, title, description, updates, updated_at } = incident;
             const latestUpdate =
-              updates?.length > 0 && updates[updates.length - 1];
+              updates?.length > 0 && updates[0];
             const updatedAt = latestUpdate
               ? latestUpdate.updated_at
               : updated_at;
