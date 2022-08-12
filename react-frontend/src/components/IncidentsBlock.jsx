@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import API from "../config/API";
 import DateUtils from "../utils/DateUtils";
 import IncidentUpdate from "./IncidentUpdate";
@@ -33,47 +33,59 @@ const IncidentsBlock = ({ service, group }) => {
       <div className="col-12 mt-2">
         {incidents?.length > 0 ? (
           incidents?.map((incident) => {
-            const { id, title, description, updated_at } = incident;
+            const { id, title, description, updates, updated_at } = incident;
+            const latestUpdate =
+              updates?.length > 0 && updates[updates.length - 1];
+            const updatedAt = latestUpdate
+              ? latestUpdate.updated_at
+              : updated_at;
 
             return (
-              <>
+              <Fragment key={id}>
                 <span className="braker mt-1 mb-3"></span>
+
                 <div
                   className={`incident-title col-12 ${
                     incidentsShow[id] && "mb-3"
                   }`}>
-                  {incidentsShow[id] ? (
-                    <button
-                      className="square-minus"
-                      type="button"
-                      id={id}
-                      onClick={handleIncidentShow}
-                    />
-                  ) : (
-                    <button
-                      className="square-plus"
-                      type="button"
-                      id={id}
-                      onClick={handleIncidentShow}
-                    />
+                  {updates?.length > 0 && (
+                    <>
+                      {incidentsShow[id] ? (
+                        <button
+                          className="square-minus"
+                          type="button"
+                          id={id}
+                          onClick={handleIncidentShow}
+                        />
+                      ) : (
+                        <button
+                          className="square-plus"
+                          type="button"
+                          id={id}
+                          onClick={handleIncidentShow}
+                        />
+                      )}
+                    </>
                   )}
+
                   <div className="title-wrapper">
-                    <span class="subtitle no-decoration">{title}</span>
+                    <span className="subtitle no-decoration">{title}</span>
                     <span className="d-block small text-dark">
                       {description}
                     </span>
                     <span className="d-block small text-muted">
-                      Updated {DateUtils.ago(updated_at)} ago.{" "}
+                      Updated {DateUtils.ago(updatedAt)} ago.{" "}
                       {DateUtils.format(
-                        DateUtils.parseISO(updated_at),
+                        DateUtils.parseISO(updatedAt),
                         "MMM d, yyyy - HH:mm"
                       )}
                     </span>
                   </div>
                 </div>
+
                 {incidentsShow[id] && (
                   <div className="incident-updates-wrapper col-12">
-                    {incident?.updates.map((update) => {
+                    {updates?.map((update) => {
                       return (
                         <IncidentUpdate
                           key={update.id}
@@ -84,12 +96,12 @@ const IncidentsBlock = ({ service, group }) => {
                     })}
                   </div>
                 )}
-              </>
+              </Fragment>
             );
           })
         ) : (
           <div className="col-12">
-            <span class="font-14 text-muted">No recent incidents</span>
+            <span className="font-14 text-muted">No recent incidents</span>
           </div>
         )}
       </div>

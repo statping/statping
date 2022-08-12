@@ -30,7 +30,7 @@
             </div>
 
             <div class="card-body">
-                <form @submit.prevent="saveMessage">
+                <form @submit.prevent="saveMessage" ref="incidentFormRef">
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Title</label>
                         <div class="col-sm-8">
@@ -163,6 +163,12 @@ export default {
         },
 
         editIncident(incident) {
+            const [el] = this.$refs.incidentFormRef;
+
+            if (el) {
+                el.scrollIntoView({ behavior: "smooth" });
+            }
+
             this.incident = incident;
         },
 
