@@ -103,7 +103,8 @@ const IncidentsBlock = ({ service, group }) => {
                         </div>
 
                         <div className="font-14 text-muted">
-                          No recent updates
+                          We are working on the issue, updates will be posted
+                          soon.
                         </div>
                       </div>
                     )}
