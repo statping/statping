@@ -17,7 +17,7 @@ const IncidentsBlock = ({ service, group }) => {
         data = await API.incidents_service(service.id);
       }
 
-      if(Array.isArray(data)) {
+      if (Array.isArray(data)) {
         setIncidents(data);
       }
     }
@@ -36,8 +36,7 @@ const IncidentsBlock = ({ service, group }) => {
         {incidents?.length > 0 ? (
           incidents?.map((incident) => {
             const { id, title, description, updates, updated_at } = incident;
-            const latestUpdate =
-              updates?.length > 0 && updates[0];
+            const latestUpdate = updates?.length > 0 && updates[0];
             const updatedAt = latestUpdate
               ? latestUpdate.created_at
               : updated_at;
@@ -50,25 +49,23 @@ const IncidentsBlock = ({ service, group }) => {
                   className={`incident-title col-12 ${
                     incidentsShow[id] && "mb-3"
                   }`}>
-                  {updates?.length > 0 && (
-                    <>
-                      {incidentsShow[id] ? (
-                        <button
-                          className="square-minus"
-                          type="button"
-                          id={id}
-                          onClick={handleIncidentShow}
-                        />
-                      ) : (
-                        <button
-                          className="square-plus"
-                          type="button"
-                          id={id}
-                          onClick={handleIncidentShow}
-                        />
-                      )}
-                    </>
-                  )}
+                  <>
+                    {incidentsShow[id] ? (
+                      <button
+                        className="square-minus"
+                        type="button"
+                        id={id}
+                        onClick={handleIncidentShow}
+                      />
+                    ) : (
+                      <button
+                        className="square-plus"
+                        type="button"
+                        id={id}
+                        onClick={handleIncidentShow}
+                      />
+                    )}
+                  </>
 
                   <div className="title-wrapper">
                     <span className="subtitle no-decoration">{title}</span>
@@ -87,15 +84,29 @@ const IncidentsBlock = ({ service, group }) => {
 
                 {incidentsShow[id] && (
                   <div className="incident-updates-wrapper col-12">
-                    {updates?.map((update) => {
-                      return (
-                        <IncidentUpdate
-                          key={update.id}
-                          update={update}
-                          admin={false}
-                        />
-                      );
-                    })}
+                    {updates?.length > 0 ? (
+                      <>
+                        {updates?.map((update) => {
+                          return (
+                            <IncidentUpdate
+                              key={update.id}
+                              update={update}
+                              admin={false}
+                            />
+                          );
+                        })}
+                      </>
+                    ) : (
+                      <div className="d-flex">
+                        <div className="mr-2 d-flex align-items-center">
+                          <span className="dot"></span>
+                        </div>
+
+                        <div className="font-14 text-muted">
+                          No recent updates
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </Fragment>
