@@ -38,3 +38,5 @@ func HandleEmptyStatus(status string) string {
 		return status
 	}
 }
+
+const INCIDENTS = "Incidents"

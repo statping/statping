@@ -92,7 +92,7 @@ func FindOne(id int64) (*Service, error) {
 		return nil, errors.Missing(&Service{}, id)
 	}
 	service := &Service{}
-	db.First(&service, id)
+	db.Preload(INCIDENTS).First(&service, id)
 	return service, nil
 }
 
