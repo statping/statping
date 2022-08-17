@@ -3,12 +3,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import ReactTooltip from "react-tooltip";
 import API from "../config/API";
-import langs from "../config/langs";
 import GroupServiceFailures from "./GroupServiceFailures";
 import SubServiceCard from "./SubServiceCard";
 import infoIcon from "../static/info.svg";
 import { analyticsTrack } from "../utils/trackers";
 import IncidentsBlock from "./IncidentsBlock";
+import { getServiceStatus } from "../utils/helper";
 
 const GroupItem = ({ service, showPlusButton }) => {
   const [collapse, setCollapse] = useState(false);
@@ -116,12 +116,7 @@ const GroupItem = ({ service, showPlusButton }) => {
         </div>
         {!collapse && (
           <div className="service_item--left">
-            <span
-              className={`badge float-right font-12 ${
-                service.online ? "uptime" : "downtime"
-              }`}>
-              {service.online ? langs("online") : langs("offline")}
-            </span>
+            {getServiceStatus(service.online)}
           </div>
         )}
       </div>

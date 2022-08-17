@@ -70,7 +70,10 @@ const IncidentsBlock = ({ service, group }) => {
                   <div className="title-wrapper">
                     <span className="subtitle no-decoration">{title}</span>
                     <span className="d-block small text-dark">
-                      {description}
+                      <span className="font-weight-bold">
+                        Issue Description -{" "}
+                      </span>
+                      <span>{description}</span>
                     </span>
                     <span className="d-block small text-muted">
                       Updated {DateUtils.ago(updatedAt)} ago.{" "}

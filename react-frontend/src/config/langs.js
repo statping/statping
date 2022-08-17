@@ -8,6 +8,7 @@ const english = {
   login: "Login",
   logout: "Logout",
   online: "Online",
+  degraded: "Degraded",
   offline: "Offline",
   configs: "Configuration",
   username: "Username",

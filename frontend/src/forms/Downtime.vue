@@ -196,8 +196,6 @@ const checkFormErrors = (value, id) => {
         errors.failures = 'Enter Valid Positve Number without decimal point';
     } else if (!start && end) {
         errors.start = 'Need to enter Start Date';
-    } else if ( id && startSec && !endSec ) {
-        errors.end = 'Need to enter End Date';
     } else if ( endSec && startSec > endSec ) {
         errors.end = 'End Date should be greater than Start Date';
     } 
@@ -279,7 +277,7 @@ export default {
             const { id } = this.$route.params;
             const { serviceId, subStatus, failures, start, end } = this.downtime;
 
-            return serviceId && subStatus && failures && start && (id ? end : true);
+            return serviceId && subStatus && failures && start;
         },
         saveDowntime: async function () {
             const { id } = this.$route.params;
