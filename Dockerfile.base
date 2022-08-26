@@ -1,4 +1,4 @@
-FROM node:16.13.0 AS frontend
+FROM node:16.17.0 AS frontend
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG BUILDPLATFORM
 ARG GITHUB_ACCESS_TOKEN
