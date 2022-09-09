@@ -1,10 +1,10 @@
 package services
 
 import (
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/notifications"
-	"github.com/statping/statping/types/null"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/types/failures"
+	"github.com/razorpay/statping/types/notifications"
+	"github.com/razorpay/statping/types/null"
+	"github.com/razorpay/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"

@@ -1,7 +1,7 @@
 package messages
 
 import (
-	"github.com/statping/statping/types/null"
+	"github.com/razorpay/statping/types/null"
 	"time"
 )
 

@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"github.com/statping/statping/source"
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/source"
+	"github.com/razorpay/statping/types/core"
+	"github.com/razorpay/statping/utils"
 	"html/template"
 	"net/http"
 	"net/url"

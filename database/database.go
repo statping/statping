@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/jinzhu/gorm"
-	"github.com/statping/statping/types/metrics"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/types/metrics"
+	"github.com/razorpay/statping/utils"
 	"strings"
 	"time"
 

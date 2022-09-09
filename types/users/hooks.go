@@ -1,8 +1,8 @@
 package users
 
 import (
-	"github.com/statping/statping/types/errors"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/types/errors"
+	"github.com/razorpay/statping/utils"
 )
 
 func (u *User) Validate() error {

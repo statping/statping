@@ -1,8 +1,8 @@
 package failures
 
 import (
-	"github.com/statping/statping/database"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/database"
+	"github.com/razorpay/statping/utils"
 	"github.com/stretchr/testify/require"
 	"testing"
 )

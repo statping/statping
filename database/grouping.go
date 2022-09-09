@@ -3,8 +3,8 @@ package database
 import (
 	"errors"
 	"fmt"
-	"github.com/statping/statping/types"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/types"
+	"github.com/razorpay/statping/utils"
 	"net/http"
 	"net/url"
 	"strconv"

@@ -1,9 +1,9 @@
 package messages
 
 import (
-	"github.com/statping/statping/database"
-	"github.com/statping/statping/types/errors"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/database"
+	"github.com/razorpay/statping/types/errors"
+	"github.com/razorpay/statping/utils"
 )
 
 var (

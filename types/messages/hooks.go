@@ -1,8 +1,8 @@
 package messages
 
 import (
-	"github.com/statping/statping/types/errors"
-	"github.com/statping/statping/types/metrics"
+	"github.com/razorpay/statping/types/errors"
+	"github.com/razorpay/statping/types/metrics"
 )
 
 func (m *Message) Validate() error {

@@ -2,7 +2,7 @@ package services
 
 import (
 	"fmt"
-	"github.com/statping/statping/types/failures"
+	"github.com/razorpay/statping/types/failures"
 	"strings"
 	"time"
 )

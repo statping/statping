@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/types/groups"
+	"github.com/razorpay/statping/types/core"
+	"github.com/razorpay/statping/types/groups"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"

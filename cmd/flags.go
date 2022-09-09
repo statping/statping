@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/razorpay/statping/utils"
 	"github.com/spf13/cobra"
-	"github.com/statping/statping/utils"
 )
 
 var (

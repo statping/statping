@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"crypto/subtle"
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/types/users"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/types/core"
+	"github.com/razorpay/statping/types/users"
+	"github.com/razorpay/statping/utils"
 	"net/http"
 	"strings"
 )

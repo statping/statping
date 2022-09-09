@@ -79,7 +79,7 @@ jobs:
         id: checkout
         uses: actions/checkout@v2
       - name: format
-        uses: docker://golang:1.13-alpine3.10
+        uses: docker://golang:1.18-alpine3.15
         env:
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
         with:

@@ -1,7 +1,7 @@
 package notifications
 
 import (
-	"github.com/statping/statping/types/metrics"
+	"github.com/razorpay/statping/types/metrics"
 )
 
 func (n *Notification) AfterFind() (err error) {

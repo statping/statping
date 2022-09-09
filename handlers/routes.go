@@ -3,13 +3,13 @@ package handlers
 import (
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/statping/statping/source"
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/source"
+	"github.com/razorpay/statping/types/core"
+	"github.com/razorpay/statping/utils"
 	"net/http"
 	"net/http/pprof"
 
-	_ "github.com/statping/statping/types/metrics"
+	_ "github.com/razorpay/statping/types/metrics"
 )
 
 var (

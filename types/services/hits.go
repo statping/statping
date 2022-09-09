@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/statping/statping/types/hits"
+	"github.com/razorpay/statping/types/hits"
 	"time"
 )
 

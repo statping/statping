@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/statping/statping/types/errors"
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/notifications"
-	"github.com/statping/statping/types/services"
+	"github.com/razorpay/statping/types/errors"
+	"github.com/razorpay/statping/types/failures"
+	"github.com/razorpay/statping/types/notifications"
+	"github.com/razorpay/statping/types/services"
 	"net/http"
 	"sort"
 )

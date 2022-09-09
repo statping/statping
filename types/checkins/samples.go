@@ -1,7 +1,7 @@
 package checkins
 
 import (
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/utils"
 	"time"
 )
 

@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/types/errors"
+	"github.com/razorpay/statping/types/core"
+	"github.com/razorpay/statping/types/errors"
 	"golang.org/x/oauth2"
 	"net/http"
 	"strings"

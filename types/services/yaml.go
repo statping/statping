@@ -2,7 +2,7 @@ package services
 
 import (
 	"github.com/pkg/errors"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/utils"
 	"gopkg.in/yaml.v2"
 )
 

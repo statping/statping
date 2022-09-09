@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"errors"
-	"github.com/statping/statping/notifiers"
-	"github.com/statping/statping/types/configs"
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/types/null"
-	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/notifiers"
+	"github.com/razorpay/statping/types/configs"
+	"github.com/razorpay/statping/types/core"
+	"github.com/razorpay/statping/types/null"
+	"github.com/razorpay/statping/types/services"
+	"github.com/razorpay/statping/utils"
 	"net/http"
 	"net/url"
 	"strconv"

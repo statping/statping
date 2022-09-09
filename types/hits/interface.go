@@ -2,7 +2,7 @@ package hits
 
 import (
 	"fmt"
-	"github.com/statping/statping/database"
+	"github.com/razorpay/statping/database"
 	"time"
 )
 

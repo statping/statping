@@ -5,13 +5,13 @@ import (
 	"fmt"
 
 	"github.com/go-mail/mail"
+	"github.com/razorpay/statping/types/core"
+	"github.com/razorpay/statping/types/failures"
+	"github.com/razorpay/statping/types/notifications"
+	"github.com/razorpay/statping/types/notifier"
+	"github.com/razorpay/statping/types/services"
+	"github.com/razorpay/statping/utils"
 	"github.com/statping/emails"
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/notifications"
-	"github.com/statping/statping/types/notifier"
-	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/utils"
 )
 
 var _ notifier.Notifier = (*emailer)(nil)

@@ -2,7 +2,7 @@ package checkins
 
 import (
 	"fmt"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/utils"
 	"time"
 )
 

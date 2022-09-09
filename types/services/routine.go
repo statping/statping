@@ -5,7 +5,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/statping/statping/types/downtimes"
+	"github.com/razorpay/statping/types/downtimes"
 	"net"
 	"net/http"
 	"net/url"
@@ -14,13 +14,13 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/statping/statping/types/metrics"
+	"github.com/razorpay/statping/types/metrics"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/hits"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/types/failures"
+	"github.com/razorpay/statping/types/hits"
+	"github.com/razorpay/statping/utils"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 

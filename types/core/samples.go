@@ -1,8 +1,8 @@
 package core
 
 import (
-	"github.com/statping/statping/types/null"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/types/null"
+	"github.com/razorpay/statping/utils"
 )
 
 func Example() *Core {

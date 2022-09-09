@@ -13,9 +13,9 @@ COPY --from=base /usr/local/share/ca-certificates /usr/local/share/
 WORKDIR /app
 VOLUME /app
 
-COPY --from=base /go/src/github.com/statping/statping/react/ ./react/
+COPY --from=base /go/src/github.com/razorpay/statping/react/ ./react/
 
-COPY --from=base /go/src/github.com/statping/statping/configs/*.yml ./configs/
+COPY --from=base /go/src/github.com/razorpay/statping/configs/*.yml ./configs/
 
 ENV IS_DOCKER=true
 ENV SASS=/usr/local/bin/sassc

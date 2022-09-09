@@ -2,7 +2,7 @@ package configs
 
 import (
 	"errors"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/utils"
 	"gopkg.in/yaml.v2"
 	"os"
 )

@@ -2,7 +2,7 @@ package failures
 
 import (
 	"fmt"
-	"github.com/statping/statping/database"
+	"github.com/razorpay/statping/database"
 	"time"
 )
 

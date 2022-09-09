@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/notifications"
+	"github.com/razorpay/statping/types/failures"
+	"github.com/razorpay/statping/types/notifications"
 )
 
 var (

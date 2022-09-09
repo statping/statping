@@ -3,12 +3,12 @@ package services
 import (
 	"database/sql/driver"
 	"encoding/json"
-	"github.com/statping/statping/types/checkins"
-	"github.com/statping/statping/types/downtimes"
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/incidents"
-	"github.com/statping/statping/types/messages"
-	"github.com/statping/statping/types/null"
+	"github.com/razorpay/statping/types/checkins"
+	"github.com/razorpay/statping/types/downtimes"
+	"github.com/razorpay/statping/types/failures"
+	"github.com/razorpay/statping/types/incidents"
+	"github.com/razorpay/statping/types/messages"
+	"github.com/razorpay/statping/types/null"
 	"time"
 )
 

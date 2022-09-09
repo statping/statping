@@ -2,9 +2,7 @@ FROM node:16.17.0 AS frontend
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG BUILDPLATFORM
 ARG GITHUB_ACCESS_TOKEN
-
 ENV GITHUB_ACCESS_TOKEN ${GITHUB_ACCESS_TOKEN}
-
 # Build vue frontent
 WORKDIR /statping
 COPY ./frontend/package.json .
@@ -22,9 +20,10 @@ RUN yarn install --pure-lockfile --network-timeout 1000000
 COPY ./react-frontend/ .
 RUN yarn build && yarn cache clean
 
+
 # Statping Golang BACKEND building from source
 # Creates "/go/bin/statping" and "/usr/local/bin/sass" for copying
-FROM golang:1.14-alpine AS backend
+FROM golang:1.18-alpine AS backend
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG VERSION
 ARG COMMIT
@@ -39,14 +38,14 @@ RUN git clone https://github.com/sass/sassc.git
 RUN . sassc/script/bootstrap && make -C sassc -j4
 # sassc binary: /root/sassc/bin/sassc
 
-WORKDIR /go/src/github.com/statping/statping
+WORKDIR /go/src/github.com/razorpay/statping
 ADD go.mod go.sum ./
 RUN go mod download
 ENV GO111MODULE on
 ENV CGO_ENABLED 1
 RUN go get github.com/stretchr/testify/assert && \
     go get github.com/stretchr/testify/require && \
-    go get github.com/GeertJohan/go.rice/rice && \
+    go install github.com/GeertJohan/go.rice/rice@latest && \
     go get github.com/cortesi/modd/cmd/modd && \
     go get github.com/crazy-max/xgo
 COPY . .

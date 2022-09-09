@@ -5,8 +5,8 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/statping/statping/types"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/types"
+	"github.com/razorpay/statping/utils"
 	gormbulk "github.com/t-tiger/gorm-bulk-insert/v2"
 	"time"
 )

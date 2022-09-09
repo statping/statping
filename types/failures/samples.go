@@ -2,8 +2,8 @@ package failures
 
 import (
 	"fmt"
-	"github.com/statping/statping/types"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/types"
+	"github.com/razorpay/statping/utils"
 	gormbulk "github.com/t-tiger/gorm-bulk-insert/v2"
 	"time"
 )

@@ -2,10 +2,10 @@ package core
 
 import (
 	"github.com/pkg/errors"
-	"github.com/statping/statping/database"
-	"github.com/statping/statping/types/metrics"
-	"github.com/statping/statping/types/null"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/database"
+	"github.com/razorpay/statping/types/metrics"
+	"github.com/razorpay/statping/types/null"
+	"github.com/razorpay/statping/utils"
 )
 
 var db database.Database

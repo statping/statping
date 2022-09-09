@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/statping/statping/source"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/source"
+	"github.com/razorpay/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

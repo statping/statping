@@ -2,7 +2,7 @@ package configs
 
 import (
 	"github.com/pkg/errors"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/utils"
 	"os"
 	"path/filepath"
 	"strings"

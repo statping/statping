@@ -10,7 +10,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/utils"
 	"github.com/tdewolff/minify/v2"
 	"github.com/tdewolff/minify/v2/html"
 )

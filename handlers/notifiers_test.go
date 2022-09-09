@@ -3,9 +3,9 @@ package handlers
 import (
 	"testing"
 
-	"github.com/statping/statping/notifiers"
-	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/notifiers"
+	"github.com/razorpay/statping/types/services"
+	"github.com/razorpay/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

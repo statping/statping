@@ -2,8 +2,8 @@ package downtimes
 
 import (
 	"fmt"
-	"github.com/statping/statping/database"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/database"
+	"github.com/razorpay/statping/utils"
 	"strconv"
 	"time"
 )

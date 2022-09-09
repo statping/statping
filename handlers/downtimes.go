@@ -3,9 +3,9 @@ package handlers
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/statping/statping/types/downtimes"
-	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/types/downtimes"
+	"github.com/razorpay/statping/types/services"
+	"github.com/razorpay/statping/utils"
 	"net/http"
 	"net/url"
 	"time"

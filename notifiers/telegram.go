@@ -8,12 +8,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/notifications"
-	"github.com/statping/statping/types/notifier"
-	"github.com/statping/statping/types/null"
-	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/types/failures"
+	"github.com/razorpay/statping/types/notifications"
+	"github.com/razorpay/statping/types/notifier"
+	"github.com/razorpay/statping/types/null"
+	"github.com/razorpay/statping/types/services"
+	"github.com/razorpay/statping/utils"
 )
 
 var _ notifier.Notifier = (*telegram)(nil)

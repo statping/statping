@@ -5,10 +5,10 @@ import (
 	"html/template"
 	"time"
 
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/types/core"
+	"github.com/razorpay/statping/types/failures"
+	"github.com/razorpay/statping/types/services"
+	"github.com/razorpay/statping/utils"
 )
 
 //go:generate go run generate.go

@@ -1,7 +1,7 @@
 package source
 
 import (
-	"github.com/statping/statping/utils"
+	"github.com/razorpay/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
