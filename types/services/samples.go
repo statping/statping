@@ -159,7 +159,7 @@ func Samples() error {
 
 	s6 := &Service{
 		Name:      "Private Service",
-		Domain:    "https://push.statping.com",
+		Domain:    "https://example.org",
 		Method:    "GET",
 		Interval:  30,
 		Type:      "http",
