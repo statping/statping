@@ -73,7 +73,11 @@ func IsReadAuthenticated(r *http.Request) bool {
 	if ok := hasAuthorizationHeader(r); ok {
 		return true
 	}
-	return IsFullAuthenticated(r)
+	_, err := getJwtToken(r)
+	if err == nil {
+		return true
+	}
+	return false
 }
 
 // IsFullAuthenticated returns true if the HTTP request is authenticated. You can set the environment variable GO_ENV=test

@@ -1,13 +1,14 @@
 package handlers
 
 import (
+	"net"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/statping-ng/statping-ng/types/checkins"
 	"github.com/statping-ng/statping-ng/types/errors"
 	"github.com/statping-ng/statping-ng/types/services"
 	"github.com/statping-ng/statping-ng/utils"
-	"net"
-	"net/http"
 )
 
 func findCheckin(r *http.Request) (*checkins.Checkin, string, error) {
@@ -23,8 +24,9 @@ func findCheckin(r *http.Request) (*checkins.Checkin, string, error) {
 	return checkin, id, nil
 }
 
-func apiAllCheckinsHandler(w http.ResponseWriter, r *http.Request) {
-	returnJson(checkins.All(), w, r)
+func apiAllCheckinsHandler(r *http.Request) interface{} {
+	checkins := checkins.All()
+	return checkins
 }
 
 func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
