@@ -1,29 +1,29 @@
 package handlers
 
 import (
+	"net/http"
+	"sort"
+
 	"github.com/gorilla/mux"
 	"github.com/statping-ng/statping-ng/types/errors"
 	"github.com/statping-ng/statping-ng/types/failures"
 	"github.com/statping-ng/statping-ng/types/notifications"
 	"github.com/statping-ng/statping-ng/types/services"
-	"net/http"
-	"sort"
 )
 
-func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
+func apiAllNotifiersHandler(r *http.Request) interface{} {
 	var notifs []notifications.Notification
 	for _, n := range services.AllNotifiers() {
 		notif := n.Select()
 		no, err := notifications.Find(notif.Method)
 		if err != nil {
 			log.Error(err)
-			sendErrorJson(err, w, r)
 		}
 		notif.UpdateFields(no)
 		notifs = append(notifs, *notif)
 	}
 	sort.Sort(notifications.NotificationOrder(notifs))
-	returnJson(notifs, w, r)
+	return notifs
 }
 
 func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {

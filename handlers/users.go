@@ -2,11 +2,12 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/statping-ng/statping-ng/types/errors"
 	"github.com/statping-ng/statping-ng/types/users"
 	"github.com/statping-ng/statping-ng/utils"
-	"net/http"
 )
 
 func findUser(r *http.Request) (*users.User, int64, error) {
@@ -75,9 +76,9 @@ func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonAction(user, "delete", w, r)
 }
 
-func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
+func apiAllUsersHandler(r *http.Request) interface{} {
 	allUsers := users.All()
-	returnJson(allUsers, w, r)
+	return allUsers
 }
 
 func apiCheckUserTokenHandler(w http.ResponseWriter, r *http.Request) {
