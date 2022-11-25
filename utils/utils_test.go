@@ -2,13 +2,14 @@ package utils
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCreateLog(t *testing.T) {
@@ -214,4 +215,11 @@ func TestPerlin(t *testing.T) {
 	for hi := 1.; hi <= 100.; hi++ {
 		assert.NotZero(t, p.Noise1D(hi/500))
 	}
+}
+
+func TestPing(t *testing.T) {
+	duration, error := Ping("localhost", 1)
+
+	assert.Nil(t, error)
+	assert.NotEqual(t, 0, duration)
 }

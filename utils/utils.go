@@ -11,11 +11,13 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/go-ping/ping"
 	"github.com/statping-ng/statping-ng/types/metrics"
 )
 
@@ -78,7 +80,8 @@ func ToString(s interface{}) string {
 }
 
 // Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
-//		in, out, err := Command("sass assets/scss assets/css/base.css")
+//
+//	in, out, err := Command("sass assets/scss assets/css/base.css")
 func Command(name string, args ...string) (string, string, error) {
 	testCmd := exec.Command(name, args...)
 	var stdout, stderr []byte
@@ -247,4 +250,32 @@ func HttpRequest(endpoint, method string, contentType interface{}, headers []str
 	metrics.Histo("duration", Now().Sub(t1).Seconds(), endpoint, method)
 
 	return contents, resp, err
+}
+
+func Ping(address string, secondsTimeout int) (int64, error) {
+	ping, err := ping.NewPinger(address)
+
+	if err != nil {
+		return 0, err
+	}
+
+	ping.Count = 1
+	ping.Timeout = time.Second * time.Duration(secondsTimeout)
+
+	if runtime.GOOS == "windows" {
+		ping.SetPrivileged(true)
+	}
+
+	err = ping.Run()
+	if err != nil {
+		return 0, err
+	}
+
+	stats := ping.Statistics()
+
+	if stats.PacketsSent-stats.PacketsRecv != 0 {
+		return 0, errors.New("destination host unreachable")
+	}
+
+	return stats.MinRtt.Microseconds(), nil
 }
