@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/statping/statping/handlers"
-	"github.com/statping/statping/source"
-	"github.com/statping/statping/types/configs"
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/handlers"
+	"github.com/statping-ng/statping-ng/source"
+	"github.com/statping-ng/statping-ng/types/configs"
+	"github.com/statping-ng/statping-ng/types/core"
+	"github.com/statping-ng/statping-ng/types/services"
+	"github.com/statping-ng/statping-ng/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -351,7 +351,7 @@ func ask(format string) bool {
 func updateDisplay() error {
 	gitCurrent, err := checkGithubUpdates()
 	if err != nil {
-		return errors.Wrap(err, "Issue connecting to https://github.com/statping/statping")
+		return errors.Wrap(err, "Issue connecting to https://github.com/statping-ng/statping-ng")
 	}
 	if gitCurrent.TagName == "" {
 		return nil
@@ -395,7 +395,7 @@ func runOnce() error {
 }
 
 func checkGithubUpdates() (githubResponse, error) {
-	url := "https://api.github.com/repos/statping/statping/releases/latest"
+	url := "https://api.github.com/repos/statping-ng/statping-ng/releases/latest"
 	contents, _, err := utils.HttpRequest(url, "GET", nil, nil, nil, time.Duration(2*time.Second), true, nil)
 	if err != nil {
 		return githubResponse{}, err

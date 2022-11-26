@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/notifications"
+	"github.com/statping-ng/statping-ng/types/failures"
+	"github.com/statping-ng/statping-ng/types/notifications"
 )
 
 var (

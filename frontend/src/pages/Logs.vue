@@ -61,7 +61,7 @@ export default {
           const ts = data.match(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/gm)
           return {
             time: ts[0],
-            message: data.split(ts+": ")[1]
+            message: data.split(ts+": ")[1] || ''
           }
         },
         cleanLog(l) {

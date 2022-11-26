@@ -1,8 +1,8 @@
 package messages
 
 import (
-	"github.com/statping/statping/types/errors"
-	"github.com/statping/statping/types/metrics"
+	"github.com/statping-ng/statping-ng/types/errors"
+	"github.com/statping-ng/statping-ng/types/metrics"
 )
 
 func (m *Message) Validate() error {

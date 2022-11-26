@@ -5,10 +5,10 @@ import (
 	"html/template"
 	"time"
 
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/types/core"
+	"github.com/statping-ng/statping-ng/types/failures"
+	"github.com/statping-ng/statping-ng/types/services"
+	"github.com/statping-ng/statping-ng/utils"
 )
 
 //go:generate go run generate.go
@@ -26,6 +26,7 @@ type replacer struct {
 func InitNotifiers() {
 	Add(
 		slacker,
+		mattermoster,
 		Command,
 		Discorder,
 		email,
@@ -35,7 +36,6 @@ func InitNotifiers() {
 		Webhook,
 		Mobile,
 		Pushover,
-		statpingMailer,
 		Gotify,
 		AmazonSNS,
 	)

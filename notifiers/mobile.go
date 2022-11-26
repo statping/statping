@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/notifications"
-	"github.com/statping/statping/types/notifier"
-	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/types/failures"
+	"github.com/statping-ng/statping-ng/types/notifications"
+	"github.com/statping-ng/statping-ng/types/notifier"
+	"github.com/statping-ng/statping-ng/types/services"
+	"github.com/statping-ng/statping-ng/utils"
 	"time"
 )
 

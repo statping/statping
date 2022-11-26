@@ -1,6 +1,6 @@
 package configs
 
-import "github.com/statping/statping/database"
+import "github.com/statping-ng/statping-ng/database"
 
 const SqliteFilename = "statping.db"
 

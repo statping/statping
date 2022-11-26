@@ -1,10 +1,10 @@
 package groups
 
 import (
-	"github.com/statping/statping/database"
-	"github.com/statping/statping/types/null"
-	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/database"
+	"github.com/statping-ng/statping-ng/types/null"
+	"github.com/statping-ng/statping-ng/types/services"
+	"github.com/statping-ng/statping-ng/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"

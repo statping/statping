@@ -1,8 +1,8 @@
 package notifier
 
 import (
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/services"
+	"github.com/statping-ng/statping-ng/types/failures"
+	"github.com/statping-ng/statping-ng/types/services"
 )
 
 // Notifier interface is required to create a new Notifier

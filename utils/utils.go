@@ -9,15 +9,16 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"net/url"
 	"os"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/statping/statping/types/metrics"
+	"github.com/go-ping/ping"
+	"github.com/statping-ng/statping-ng/types/metrics"
 )
 
 var (
@@ -79,7 +80,8 @@ func ToString(s interface{}) string {
 }
 
 // Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
-//		in, out, err := Command("sass assets/scss assets/css/base.css")
+//
+//	in, out, err := Command("sass assets/scss assets/css/base.css")
 func Command(name string, args ...string) (string, string, error) {
 	testCmd := exec.Command(name, args...)
 	var stdout, stderr []byte
@@ -174,7 +176,7 @@ func HttpRequest(endpoint, method string, contentType interface{}, headers []str
 		return nil, nil, err
 	}
 	// set default headers so end user can overwrite them if needed
-	req.Header.Set("User-Agent", "Statping")
+	req.Header.Set("User-Agent", "Statping-ng")
 	req.Header.Set("Statping-Version", Params.GetString("VERSION"))
 	req.Header.Set("Accept", "text/html")
 
@@ -215,16 +217,8 @@ func HttpRequest(endpoint, method string, contentType interface{}, headers []str
 		Proxy:                 http.ProxyFromEnvironment,
 		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 			// redirect all connections to host specified in url
-			addr = strings.Split(req.URL.Host, ":")[0] + addr[strings.LastIndex(addr, ":"):]
 			return dialer.DialContext(ctx, network, addr)
 		},
-	}
-	if Params.GetString("HTTP_PROXY") != "" {
-		proxyUrl, err := url.Parse(Params.GetString("HTTP_PROXY"))
-		if err != nil {
-			return nil, nil, err
-		}
-		transport.Proxy = http.ProxyURL(proxyUrl)
 	}
 	if customTLS != nil {
 		transport.TLSClientConfig.RootCAs = customTLS.RootCAs
@@ -256,4 +250,32 @@ func HttpRequest(endpoint, method string, contentType interface{}, headers []str
 	metrics.Histo("duration", Now().Sub(t1).Seconds(), endpoint, method)
 
 	return contents, resp, err
+}
+
+func Ping(address string, secondsTimeout int) (int64, error) {
+	ping, err := ping.NewPinger(address)
+
+	if err != nil {
+		return 0, err
+	}
+
+	ping.Count = 1
+	ping.Timeout = time.Second * time.Duration(secondsTimeout)
+
+	if runtime.GOOS == "windows" {
+		ping.SetPrivileged(true)
+	}
+
+	err = ping.Run()
+	if err != nil {
+		return 0, err
+	}
+
+	stats := ping.Statistics()
+
+	if stats.PacketsSent-stats.PacketsRecv != 0 {
+		return 0, errors.New("destination host unreachable")
+	}
+
+	return stats.MinRtt.Microseconds(), nil
 }

@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/types/services"
+	"github.com/statping-ng/statping-ng/types/core"
+	"github.com/statping-ng/statping-ng/types/services"
 	"net/http"
 )
 

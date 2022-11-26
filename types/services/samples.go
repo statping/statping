@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/statping/statping/types/null"
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/types/null"
+	"github.com/statping-ng/statping-ng/utils"
 	"time"
 )
 
@@ -83,7 +83,7 @@ func Samples() error {
 
 	s2 := &Service{
 		Name:           "Statping Github",
-		Domain:         "https://github.com/statping/statping",
+		Domain:         "https://github.com/statping-ng/statping-ng",
 		ExpectedStatus: 200,
 		Interval:       30,
 		Type:           "http",
@@ -159,7 +159,7 @@ func Samples() error {
 
 	s6 := &Service{
 		Name:      "Private Service",
-		Domain:    "https://push.statping.com",
+		Domain:    "https://example.org",
 		Method:    "GET",
 		Interval:  30,
 		Type:      "http",

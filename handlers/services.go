@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/statping/statping/database"
-	"github.com/statping/statping/types/errors"
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/hits"
-	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/database"
+	"github.com/statping-ng/statping-ng/types/errors"
+	"github.com/statping-ng/statping-ng/types/failures"
+	"github.com/statping-ng/statping-ng/types/hits"
+	"github.com/statping-ng/statping-ng/types/services"
+	"github.com/statping-ng/statping-ng/utils"
 	"net/http"
 )
 

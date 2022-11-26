@@ -23,6 +23,7 @@ services:
 
   statping_sqlite:
     container_name: statping_sqlite
+    platform: linux/amd64
     build:
       context: ./
     restart: on-failure
@@ -33,7 +34,7 @@ services:
       DB_CONN: sqlite
       API_SECRET: exampleapisecret
       NAME: Statping
-      DOMAIN: http://localhost:8080
+      DOMAIN: http://localhost:8084
       DESCRIPTION: This is a dev environment on SQLite!
       ADMIN_USER: admin
       ADMIN_PASSWORD: admin
@@ -51,6 +52,7 @@ services:
 
   statping_mysql:
     container_name: statping_mysql
+    platform: linux/amd64
     build:
       context: ./
     restart: on-failure
@@ -87,6 +89,7 @@ services:
 
   statping_postgres:
     container_name: statping_postgres
+    platform: linux/amd64
     build:
       context: ./
     restart: on-failure
@@ -123,6 +126,7 @@ services:
 
   statping_mariadb:
     container_name: statping_mariadb
+    platform: linux/amd64
     build:
       context: ./
     restart: on-failure
@@ -185,8 +189,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password123
       MYSQL_DATABASE: statping
-      MYSQL_USER: root
-      MYSQL_PASSWORD: password123
     ports:
       - 3306:3306
     networks:
@@ -206,8 +208,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password123
       MYSQL_DATABASE: statping
-      MYSQL_USER: root
-      MYSQL_PASSWORD: password123
     ports:
       - 3307:3306
     networks:
@@ -230,6 +230,7 @@ services:
 
   prometheus:
     container_name: prometheus
+    platform: linux/amd64
     image: prom/prometheus:v2.0.0
     restart: on-failure
     volumes:

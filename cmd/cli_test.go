@@ -2,8 +2,8 @@ package main
 
 import (
 	"bytes"
-	"github.com/statping/statping/source"
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/source"
+	"github.com/statping-ng/statping-ng/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"

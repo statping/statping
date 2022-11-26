@@ -1,6 +1,7 @@
 import english from "./english"
 import spanish from "./spanish"
 import german from "./german"
+import czech from "./czech"
 import russian from "./russian";
 import french from "./french";
 import japanese from "./japanese";
@@ -12,6 +13,7 @@ const language = {
   en: english,
   es: spanish,
   de: german,
+  cs: czech,
   ru: russian,
   fr: french,
   ja: japanese,

@@ -3,14 +3,14 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/statping/statping/types/errors"
 	"html/template"
 	"net/http"
 	"path"
 	"time"
 
-	"github.com/statping/statping/source"
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/source"
+	"github.com/statping-ng/statping-ng/types/errors"
+	"github.com/statping-ng/statping-ng/utils"
 )
 
 const (
@@ -73,7 +73,11 @@ func IsReadAuthenticated(r *http.Request) bool {
 	if ok := hasAuthorizationHeader(r); ok {
 		return true
 	}
-	return IsFullAuthenticated(r)
+	_, err := getJwtToken(r)
+	if err == nil {
+		return true
+	}
+	return false
 }
 
 // IsFullAuthenticated returns true if the HTTP request is authenticated. You can set the environment variable GO_ENV=test
@@ -172,13 +176,24 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 	if err != nil {
 		log.Errorln(err)
 	}
-	render, err := source.TmplBox.String(file)
-	if err != nil {
-		log.Errorln(err)
-	}
-	// render the page requested
-	if _, err := mainTemplate.Parse(render); err != nil {
-		log.Errorln(err)
+
+	asset := file
+	if source.UsingAssets(utils.Directory) {
+
+		asset = utils.Directory + "/assets/" + file
+
+		if _, err := mainTemplate.ParseFiles(asset); err != nil {
+			log.Errorln(err)
+		}
+	} else {
+		render, err := source.TmplBox.String(asset)
+		if err != nil {
+			log.Errorln(err)
+		}
+		// render the page requested
+		if _, err := mainTemplate.Parse(render); err != nil {
+			log.Errorln(err)
+		}
 	}
 	// execute the template
 	if err := mainTemplate.Execute(w, data); err != nil {

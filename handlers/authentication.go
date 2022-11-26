@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"crypto/subtle"
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/types/users"
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/types/core"
+	"github.com/statping-ng/statping-ng/types/users"
+	"github.com/statping-ng/statping-ng/utils"
 	"net/http"
 	"strings"
 )

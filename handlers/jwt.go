@@ -3,7 +3,7 @@ package handlers
 import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/pkg/errors"
-	"github.com/statping/statping/types/users"
+	"github.com/statping-ng/statping-ng/types/users"
 	"net/http"
 	"time"
 )

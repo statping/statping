@@ -1,7 +1,7 @@
 <template>
     <form @submit.prevent="saveSettings">
     <div class="card">
-        <div class="card-header">Statping Settings</div>
+        <div class="card-header">Statping-ng Settings</div>
         <div class="card-body">
                 <div class="form-group">
                     <label>{{ $t('project_name') }}</label>
@@ -42,6 +42,7 @@
                         <option value="fr">French</option>
                         <option value="ru">Russian</option>
                         <option value="de">German</option>
+                        <option value="cs">Czech</option>
                         <option value="ja">Japanese</option>
                         <option value="it">Italian</option>
                         <option value="ko">Korean</option>

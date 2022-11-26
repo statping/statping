@@ -1,3 +1,4 @@
+//go:build ignore
 // +build ignore
 
 package main
@@ -9,7 +10,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/utils"
 	"github.com/tdewolff/minify/v2"
 	"github.com/tdewolff/minify/v2/html"
 )

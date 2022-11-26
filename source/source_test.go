@@ -1,7 +1,7 @@
 package source
 
 import (
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"

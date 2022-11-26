@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"github.com/GeertJohan/go.rice"
 	"github.com/pkg/errors"
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/utils"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -30,6 +30,7 @@ var (
 		"scss/mobile.scss",
 		"scss/variables.scss",
 		"robots.txt",
+		"base.gohtml",
 	}
 )
 
@@ -174,7 +175,7 @@ func DeleteAllAssets(folder string) error {
 // CopyAllToPublic will copy all the files in a rice box into a local folder
 func CopyAllToPublic(box *rice.Box) error {
 	exclude := map[string]bool{
-		"base.gohtml": true,
+		// "base.gohtml": true,
 		"index.html":  true,
 	}
 
