@@ -99,7 +99,7 @@ export const generateTooltipPosition = (...args) => {
 
   if (place === "left" || place === "right") {
     return {
-      top: top,
+      top,
       left: place === "left" ? left + offset : left - offset,
     };
   }
