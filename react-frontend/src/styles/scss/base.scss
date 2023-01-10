@@ -131,11 +131,12 @@
 }
 
 .block-chart {
+  padding-top: 7px;
+  height: 100%;
   display: flex;
-  justify-content: center;
-  margin: 1rem 0;
-  padding: 0 0.75rem;
-
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  gap: 1px;
   div.service_day:last-child {
     margin-right: 0;
   }
@@ -144,8 +145,9 @@
 .service_day {
   position: relative;
   height: 24px;
-  min-width: 4px;
-  margin-right: 2px;
+  min-width: 6px;
+  margin-right: 1.5px;
+  margin-bottom: 4px;
   cursor: pointer;
 }
 

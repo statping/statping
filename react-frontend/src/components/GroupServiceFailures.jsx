@@ -132,6 +132,21 @@ const GroupServiceFailures = ({ group = null, service, collapse }) => {
 
   if (loaded) return <ServiceLoader text="Loading series.." />;
 
+  const generateTooltipPosition = (...args) => {
+    const position = args?.[0]; //tooltip default position
+    const place = args?.[4]; // tooltip placement
+    const offset = 6;
+
+    if (place === "left" || place === "right") {
+      return {
+        top: position.top,
+        left:
+          place === "left" ? position.left + offset : position.left - offset,
+      };
+    }
+    return position;
+  };
+
   return (
     <div name="fade" style={{ display: collapse ? "none" : "block" }}>
       <div className="block-chart">
@@ -140,16 +155,18 @@ const GroupServiceFailures = ({ group = null, service, collapse }) => {
           place="bottom"
           backgroundColor="#344A6C"
           html={true}
+          overridePosition={generateTooltipPosition}
         />
         {failureData?.length > 0 ? (
           failureData.map((d, i) => {
             return (
               <div
-                className={`flex-fill service_day ${STATUS_CLASS[d.status]}`}
+                className={`service_day ${STATUS_CLASS[d.status]}`}
                 onMouseOver={() => handleMouseOver(d)}
                 onMouseOut={handleMouseOut}
                 key={i}
-                data-tip={hoverText}>
+                data-tip={hoverText}
+              >
                 {d.status !== 0 && (
                   <span className="d-none d-md-block text-center small"></span>
                 )}
@@ -166,13 +183,8 @@ const GroupServiceFailures = ({ group = null, service, collapse }) => {
         <div className="no-select">
           <p className="divided justify-content-between">
             <span className="timeline-text font-12">
-              90 {langs("days_ago")}
+              {langs("status_over_the_past")} 90 {langs("days")}
             </span>
-            {/* <span className="timeline-divider"></span> */}
-            {/* <span className="timeline-text font-12">{service_txt()}</span> */}
-            {/* <span className="timeline-text font-12">{uptime}% uptime</span> */}
-            <span className="timeline-divider"></span>
-            <span className="timeline-text font-12">{langs("today")}</span>
           </p>
         </div>
       </div>
