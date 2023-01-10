@@ -6,7 +6,11 @@ import API from "../config/API";
 import ServiceLoader from "./ServiceLoader";
 import ReactTooltip from "react-tooltip";
 import { STATUS_CLASS } from "../utils/constants";
-import { calcPer, isObjectEmpty } from "../utils/helper";
+import {
+  calcPer,
+  generateTooltipPosition,
+  isObjectEmpty,
+} from "../utils/helper";
 import { errorToastConfig } from "../utils/toast";
 
 const STATUS_TEXT = {
@@ -131,21 +135,6 @@ const GroupServiceFailures = ({ group = null, service, collapse }) => {
   const handleMouseOut = () => setHoverText("");
 
   if (loaded) return <ServiceLoader text="Loading series.." />;
-
-  const generateTooltipPosition = (...args) => {
-    const position = args?.[0]; //tooltip default position
-    const place = args?.[4]; // tooltip placement
-    const offset = 6;
-
-    if (place === "left" || place === "right") {
-      return {
-        top: position.top,
-        left:
-          place === "left" ? position.left + offset : position.left - offset,
-      };
-    }
-    return position;
-  };
 
   return (
     <div name="fade" style={{ display: collapse ? "none" : "block" }}>

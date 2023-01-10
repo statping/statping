@@ -90,3 +90,17 @@ export const generateUUID = (length) => {
     Math.floor(Math.random() * 36).toString(36)
   ).join("");
 };
+
+export const generateTooltipPosition = (...args) => {
+  const position = args?.[0]; //tooltip default position
+  const place = args?.[4]; // tooltip placement
+  const offset = 6;
+
+  if (place === "left" || place === "right") {
+    return {
+      top: position.top,
+      left: place === "left" ? position.left + offset : position.left - offset,
+    };
+  }
+  return position;
+};
