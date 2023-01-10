@@ -93,7 +93,7 @@ export const generateUUID = (length) => {
 
 export const generateTooltipPosition = (...args) => {
   const position = args?.[0]; //tooltip default position
-  const { top, left } = position;
+  const { top, left } = position || {};
   const place = args?.[4]; // tooltip placement
   const offset = 6;
 
