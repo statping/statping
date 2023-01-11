@@ -141,6 +141,7 @@ const english = {
   notify_all: "Notify All Changes",
   service_update: "Update Service",
   service_create: "Create Service",
+  status_over_the_past: "Status over the past",
 };
 
 const langs = (v) => english[v];
