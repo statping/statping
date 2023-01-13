@@ -131,7 +131,7 @@
 }
 
 .block-chart {
-  padding-top: 7px;
+  padding: 7px 10px 0;
   height: 100%;
   display: flex;
   flex-flow: row wrap;
@@ -149,6 +149,9 @@
   margin-right: 1.5px;
   margin-bottom: 4px;
   cursor: pointer;
+  @media (min-width:820px) {
+    flex-grow: 1;
+  }
 }
 
 .service_day span {
