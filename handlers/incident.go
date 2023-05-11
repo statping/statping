@@ -72,7 +72,7 @@ func getVisibleIncidentsOfService(service *services.Service) []incidents.Inciden
 			visibleIncidentIds = append(visibleIncidentIds, incident.Id)
 		} else if checkResolvedVisibility(incident.Updates) {
 			incidentVar := *incident
-			sortUpdates(incidentVar.Updates)
+			sortUpdates(incidentVar.Updates, "DESC")
 			visibleIncidents = append(visibleIncidents, incidentVar)
 			visibleIncidentIds = append(visibleIncidentIds, incident.Id)
 		}
@@ -81,9 +81,15 @@ func getVisibleIncidentsOfService(service *services.Service) []incidents.Inciden
 	return visibleIncidents
 }
 
-func sortUpdates(updates []*incidents.IncidentUpdate) {
+func sortUpdates(updates []*incidents.IncidentUpdate, order string) {
 	sort.Slice(updates, func(i, j int) bool {
-		return updates[i].CreatedAt.Unix() >= updates[j].CreatedAt.Unix()
+		switch order {
+		case "DESC":
+			return updates[i].CreatedAt.Unix() >= updates[j].CreatedAt.Unix()
+		case "ASC":
+			return updates[i].CreatedAt.Unix() <= updates[j].CreatedAt.Unix()
+		}
+		return false
 	})
 }
 
@@ -113,7 +119,7 @@ func apiIncidentUpdatesHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	sortUpdates(incid.Updates)
+	sortUpdates(incid.Updates, "ASC")
 	returnJson(incid.Updates, w, r)
 }
 
