@@ -8,6 +8,7 @@ import (
 	"github.com/razorpay/statping/types/services"
 	"github.com/razorpay/statping/utils"
 	"net/http"
+	"sort"
 	"time"
 )
 
@@ -71,7 +72,8 @@ func getVisibleIncidentsOfService(service *services.Service) []incidents.Inciden
 			visibleIncidentIds = append(visibleIncidentIds, incident.Id)
 		} else if checkResolvedVisibility(incident.Updates) {
 			incidentVar := *incident
-			reverse(incidentVar.Updates)
+			sortUpdates(incidentVar.Updates)
+			//reverse(incidentVar.Updates)
 			visibleIncidents = append(visibleIncidents, incidentVar)
 			visibleIncidentIds = append(visibleIncidentIds, incident.Id)
 		}
@@ -80,11 +82,17 @@ func getVisibleIncidentsOfService(service *services.Service) []incidents.Inciden
 	return visibleIncidents
 }
 
-func reverse(incidents []*incidents.IncidentUpdate) {
+func sortUpdates(updates []*incidents.IncidentUpdate) {
+	sort.Slice(updates, func(i, j int) bool {
+		return updates[i].CreatedAt.Unix() >= updates[j].CreatedAt.Unix()
+	})
+}
+
+/*func reverse(incidents []*incidents.IncidentUpdate) {
 	for i, j := 0, len(incidents)-1; i < j; i, j = i+1, j-1 {
 		incidents[i], incidents[j] = incidents[j], incidents[i]
 	}
-}
+}*/
 
 func hasZeroUpdates(Updates []*incidents.IncidentUpdate) bool {
 	if len(Updates) == 0 {
@@ -93,8 +101,10 @@ func hasZeroUpdates(Updates []*incidents.IncidentUpdate) bool {
 	return false
 }
 
+// NOT [(last update is resolved) AND (last update was more than 2 hrs ago)]
 func checkResolvedVisibility(incidentUpdates []*incidents.IncidentUpdate) bool {
-	if !(incidentUpdates[len(incidentUpdates)-1].Type == resolved && getTimeDiff(incidentUpdates[len(incidentUpdates)-1]) > incidentsTimeoutInMinutes) {
+	if !(incidentUpdates[len(incidentUpdates)-1].Type == resolved &&
+		getTimeDiff(incidentUpdates[len(incidentUpdates)-1]) > incidentsTimeoutInMinutes) {
 		return true
 	}
 	return false
