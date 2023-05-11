@@ -34,7 +34,7 @@ func (i *Incident) BeforeCreate() error {
 }
 
 func (i *Incident) AfterFind() {
-	db.Model(i).Related(i.Updates).Order("created_at DESC")
+	db.Model(i).Related(&i.Updates).Order("id DESC")
 	metrics.Query("incident", "find")
 }
 

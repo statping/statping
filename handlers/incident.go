@@ -113,6 +113,7 @@ func apiIncidentUpdatesHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
+	sortUpdates(incid.Updates)
 	returnJson(incid.Updates, w, r)
 }
 
