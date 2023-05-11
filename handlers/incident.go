@@ -73,7 +73,6 @@ func getVisibleIncidentsOfService(service *services.Service) []incidents.Inciden
 		} else if checkResolvedVisibility(incident.Updates) {
 			incidentVar := *incident
 			sortUpdates(incidentVar.Updates)
-			//reverse(incidentVar.Updates)
 			visibleIncidents = append(visibleIncidents, incidentVar)
 			visibleIncidentIds = append(visibleIncidentIds, incident.Id)
 		}
@@ -87,12 +86,6 @@ func sortUpdates(updates []*incidents.IncidentUpdate) {
 		return updates[i].CreatedAt.Unix() >= updates[j].CreatedAt.Unix()
 	})
 }
-
-/*func reverse(incidents []*incidents.IncidentUpdate) {
-	for i, j := 0, len(incidents)-1; i < j; i, j = i+1, j-1 {
-		incidents[i], incidents[j] = incidents[j], incidents[i]
-	}
-}*/
 
 func hasZeroUpdates(Updates []*incidents.IncidentUpdate) bool {
 	if len(Updates) == 0 {
