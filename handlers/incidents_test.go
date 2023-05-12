@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"github.com/razorpay/statping/types/incidents"
+	"github.com/razorpay/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestUnAuthenticatedIncidentRoutes(t *testing.T) {
@@ -152,4 +155,42 @@ func TestIncidentsAPIRoutes(t *testing.T) {
 			assert.Nil(t, err)
 		})
 	}
+}
+
+func TestIncidentUpdateOrder(t *testing.T) {
+	now := utils.Now()
+	t0 := now.Add(-5 * time.Minute)
+	t1 := now.Add(-5*time.Minute + 1*time.Second)
+	t2 := now.Add(-5*time.Minute + 2*time.Second)
+
+	updates := []*incidents.IncidentUpdate{
+		{
+			Id:         78,
+			IncidentId: 23,
+			Message:    "Update 2",
+			Type:       "update",
+			CreatedAt:  t1,
+			UpdatedAt:  t2,
+		},
+		{
+			Id:         79,
+			IncidentId: 23,
+			Message:    "Resolved 1",
+			Type:       "resolved",
+			CreatedAt:  t2,
+			UpdatedAt:  t2,
+		},
+		{
+			Id:         76,
+			IncidentId: 23,
+			Message:    "Update 1",
+			Type:       "update",
+			CreatedAt:  t0,
+			UpdatedAt:  t2,
+		},
+	}
+	sortUpdates(updates, "DESC")
+	assert.Equal(t, int64(79), updates[0].Id)
+	assert.Equal(t, int64(78), updates[1].Id)
+	assert.Equal(t, int64(76), updates[2].Id)
 }
