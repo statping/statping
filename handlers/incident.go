@@ -104,8 +104,11 @@ func hasZeroUpdates(Updates []*incidents.IncidentUpdate) bool {
 func checkResolvedVisibility(incidentUpdates []*incidents.IncidentUpdate) bool {
 	if !(incidentUpdates[len(incidentUpdates)-1].Type == resolved &&
 		getTimeDiff(incidentUpdates[len(incidentUpdates)-1]) > incidentsTimeoutInMinutes) {
+		log.Info(fmt.Sprintf("Incident update resolved visibility: %v", true))
 		return true
 	}
+	// This log will also given insight into number of unnecessary incidents fetched from DB
+	log.Info(fmt.Sprintf("Incident update resolved visibility: %v", false))
 	return false
 }
 
