@@ -8,6 +8,7 @@ import (
 	"github.com/razorpay/statping/types/services"
 	"github.com/razorpay/statping/utils"
 	"net/http"
+	"sort"
 	"time"
 )
 
@@ -71,7 +72,7 @@ func getVisibleIncidentsOfService(service *services.Service) []incidents.Inciden
 			visibleIncidentIds = append(visibleIncidentIds, incident.Id)
 		} else if checkResolvedVisibility(incident.Updates) {
 			incidentVar := *incident
-			reverse(incidentVar.Updates)
+			sortUpdates(incidentVar.Updates, "DESC")
 			visibleIncidents = append(visibleIncidents, incidentVar)
 			visibleIncidentIds = append(visibleIncidentIds, incident.Id)
 		}
@@ -80,10 +81,16 @@ func getVisibleIncidentsOfService(service *services.Service) []incidents.Inciden
 	return visibleIncidents
 }
 
-func reverse(incidents []*incidents.IncidentUpdate) {
-	for i, j := 0, len(incidents)-1; i < j; i, j = i+1, j-1 {
-		incidents[i], incidents[j] = incidents[j], incidents[i]
-	}
+func sortUpdates(updates []*incidents.IncidentUpdate, order string) {
+	sort.Slice(updates, func(i, j int) bool {
+		switch order {
+		case "DESC":
+			return updates[i].CreatedAt.Unix() >= updates[j].CreatedAt.Unix()
+		case "ASC":
+			return updates[i].CreatedAt.Unix() <= updates[j].CreatedAt.Unix()
+		}
+		return false
+	})
 }
 
 func hasZeroUpdates(Updates []*incidents.IncidentUpdate) bool {
@@ -93,10 +100,15 @@ func hasZeroUpdates(Updates []*incidents.IncidentUpdate) bool {
 	return false
 }
 
+// NOT [(last update is resolved) AND (last update was more than 2 hrs ago)]
 func checkResolvedVisibility(incidentUpdates []*incidents.IncidentUpdate) bool {
-	if !(incidentUpdates[len(incidentUpdates)-1].Type == resolved && getTimeDiff(incidentUpdates[len(incidentUpdates)-1]) > incidentsTimeoutInMinutes) {
+	if !(incidentUpdates[len(incidentUpdates)-1].Type == resolved &&
+		getTimeDiff(incidentUpdates[len(incidentUpdates)-1]) > incidentsTimeoutInMinutes) {
+		log.Info(fmt.Sprintf("Incident update resolved visibility: %v", true))
 		return true
 	}
+	// This log will also given insight into number of unnecessary incidents fetched from DB
+	log.Info(fmt.Sprintf("Incident update resolved visibility: %v", false))
 	return false
 }
 
@@ -110,6 +122,7 @@ func apiIncidentUpdatesHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
+	sortUpdates(incid.Updates, "ASC")
 	returnJson(incid.Updates, w, r)
 }
 
