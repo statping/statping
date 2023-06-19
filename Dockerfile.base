@@ -23,7 +23,7 @@ RUN yarn build && yarn cache clean
 
 # Statping Golang BACKEND building from source
 # Creates "/go/bin/statping" and "/usr/local/bin/sass" for copying
-FROM golang:1.18-alpine AS backend
+FROM c.rzp.io/razorpay/onggi:rzp-golden-image-go1.20 AS backend
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG VERSION
 ARG COMMIT
