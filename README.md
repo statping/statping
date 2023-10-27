@@ -20,7 +20,7 @@ Statping strives to remain future-proof and remain intact if a failure is create
 <br><br><br>
 
 <h2>No Requirements</h2>
-Statping is built in Go Language so all you need is the precompile binary based on your operating system. You won't need to install anything extra once you have the Statping binary installed. You can even run Statping on a Raspberry Pi.
+Statping is built in Go Language so all you need is the precompiled binary based on your operating system. You won't need to install anything extra once you have the Statping binary installed. You can even run Statping on a Raspberry Pi.
 <br><br>
 <p align="center">
     <a href="https://github.com/statping/statping/wiki/Linux"><img width="5%" src="https://img.cjx.io/linux.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
