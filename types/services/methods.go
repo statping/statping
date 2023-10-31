@@ -276,6 +276,7 @@ func (s Service) OnlineDaysPercent(days int) float32 {
 func (s *Service) OnlineSince(ago time.Time) float32 {
 	failsList := s.FailuresSince(ago).Count()
 	hitsList := s.HitsSince(ago).Count()
+	totalList := failsList+hitsList
 
 	if failsList == 0 {
 		s.Online24Hours = 100.00
@@ -287,12 +288,8 @@ func (s *Service) OnlineSince(ago time.Time) float32 {
 		return s.Online24Hours
 	}
 
-	avg := (float64(failsList) / float64(hitsList)) * 100
-	avg = 100 - avg
-	if avg < 0 {
-		avg = 0
-	}
-	amount, _ := strconv.ParseFloat(fmt.Sprintf("%0.2f", avg), 10)
+	amount := (hitsList / totalList) * 100
+	
 	s.Online24Hours = float32(amount)
 	return s.Online24Hours
 }
