@@ -93,7 +93,7 @@ docker-compose up -d
 <br><br><br><br>
 
 ## Docker Compose with Automatic SSL
-You can automatically start a Statping server with automatic SSL encryption using this docker-compose file. First point your domain's DNS to the Statping server, and then run this docker-compose command with DOMAIN and EMAIL. Email is for letsencrypt services.
+You can automatically start a Statping server with automatic SSL encryption using [this docker-compose file](https://github.com/statping/statping/wiki/Docker#full-docker-compose-with-automatic-ssl). Name it `docker-compose-ssl.yml`. First point your domain's DNS to the Statping server, and then run this docker-compose command with DOMAIN and EMAIL. Email is for letsencrypt services.
 ```bash
 LETSENCRYPT_HOST=mydomain.com \
     LETSENCRYPT_EMAIL=info@mydomain.com \
