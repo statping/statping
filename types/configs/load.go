@@ -34,6 +34,13 @@ func Save() error {
 		MaxOpenConnections: p.GetInt("MAX_OPEN_CONN"),
 		MaxIdleConnections: p.GetInt("MAX_IDLE_CONN"),
 		MaxLifeConnections: int(p.GetDuration("MAX_LIFE_CONN").Seconds()),
+		KeycloakClientID:     p.GetString("KEYCLOAK_CLIENT_ID"),
+		KeycloakClientSecret: p.GetString("KEYCLOAK_CLIENT_SECRET"),
+		KeycloakAuthURL:      p.GetString("KEYCLOAK_AUTH_URL"),
+		KeycloakTokenURL:     p.GetString("KEYCLOAK_TOKEN_URL"),
+		KeycloakUserInfoURL:  p.GetString("KEYCLOAK_USER_INFO_URL"),
+		KeycloakScopes:       p.GetString("KEYCLOAK_SCOPES"),
+		KeycloakAdminGroups:  p.GetString("KEYCLOAK_ADMIN_GROUPS"),
 	}
 	return configs.Save(utils.Directory)
 }
@@ -102,6 +109,27 @@ func LoadConfigs(cfgFile string) (*DbConfig, error) {
 	if db.LetsEncryptEnable {
 		p.Set("LETSENCRYPT_ENABLE", db.LetsEncryptEnable)
 	}
+	if db.KeycloakClientID != "" {
+		p.Set("KEYCLOAK_CLIENT_ID", db.KeycloakClientID)
+	}
+	if db.KeycloakClientSecret != "" {
+		p.Set("KEYCLOAK_CLIENT_SECRET", db.KeycloakClientSecret)
+	}
+	if db.KeycloakAuthURL != "" {
+		p.Set("KEYCLOAK_AUTH_URL", db.KeycloakAuthURL)
+	}
+	if db.KeycloakTokenURL != "" {
+		p.Set("KEYCLOAK_TOKEN_URL", db.KeycloakTokenURL)
+	}
+	if db.KeycloakUserInfoURL != "" {
+		p.Set("KEYCLOAK_USER_INFO_URL", db.KeycloakUserInfoURL)
+	}
+	if db.KeycloakScopes != "" {
+		p.Set("KEYCLOAK_SCOPES", db.KeycloakScopes)
+	}
+	if db.KeycloakAdminGroups != "" {
+		p.Set("KEYCLOAK_ADMIN_GROUPS", db.KeycloakAdminGroups)
+	}
 
 	configs := &DbConfig{
 		DbConn:            p.GetString("DB_CONN"),
@@ -125,6 +153,13 @@ func LoadConfigs(cfgFile string) (*DbConfig, error) {
 		LetsEncryptEmail:  p.GetString("LETSENCRYPT_EMAIL"),
 		ApiSecret:         p.GetString("API_SECRET"),
 		SampleData:        p.GetBool("SAMPLE_DATA"),
+		KeycloakClientID:     p.GetString("KEYCLOAK_CLIENT_ID"),
+		KeycloakClientSecret: p.GetString("KEYCLOAK_CLIENT_SECRET"),
+		KeycloakAuthURL:      p.GetString("KEYCLOAK_AUTH_URL"),
+		KeycloakTokenURL:     p.GetString("KEYCLOAK_TOKEN_URL"),
+		KeycloakUserInfoURL:  p.GetString("KEYCLOAK_USER_INFO_URL"),
+		KeycloakScopes:       p.GetString("KEYCLOAK_SCOPES"),
+		KeycloakAdminGroups:  p.GetString("KEYCLOAK_ADMIN_GROUPS"),
 	}
 	log.WithFields(utils.ToFields(configs)).Debugln("read config file: " + cfgFile)
 

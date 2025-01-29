@@ -37,6 +37,10 @@
             <font-awesome-icon :icon="['fab', 'google']" /> Login with Google
         </a>
 
+        <a v-if="oauth && oauth.keycloak_client_id" @click.prevent="Keycloaklogin" href="#" class="btn btn-block btn-outline-dark">
+            <font-awesome-icon :icon="['fas', 'address-card']" /> Login with {{oauth.keycloak_name}}
+        </a>
+        
         <a v-if="oauth && oauth.custom_client_id" @click.prevent="Customlogin" href="#" class="btn btn-block btn-outline-dark">
             <font-awesome-icon :icon="['fas', 'address-card']" /> Login with {{oauth.custom_name}}
         </a>
@@ -109,6 +113,17 @@
         }
         return ""
       },
+      keycloak_scopes() {
+        let scopes = []
+        if (this.oauth.keycloak_open_id) {
+          scopes.push("openid")
+        }
+        scopes.push(this.oauth.keycloak_scopes.split(","))
+        if (scopes.length !== 0) {
+          return "&scope="+scopes.join(" ")
+        }
+        return ""
+      },
         GHlogin() {
             window.location = `https://github.com/login/oauth/authorize?client_id=${this.oauth.gh_client_id}&redirect_uri=${this.encode(this.core.domain+"/oauth/github")}&scope=read:user,read:org`
         },
@@ -120,6 +135,9 @@
         },
         Customlogin() {
           window.location = `${this.oauth.custom_endpoint_auth}?client_id=${this.oauth.custom_client_id}&redirect_uri=${this.encode(this.core.domain+"/oauth/custom")}&response_type=code${this.custom_scopes()}`
+        },
+        Keycloaklogin() {
+          window.location = `${this.oauth.keycloak_endpoint_auth}?client_id=${this.oauth.keycloak_client_id}&redirect_uri=${this.encode(this.core.domain+"/oauth/keycloak")}&response_type=code${this.keycloak_scopes()}`
         }
       }
   }
