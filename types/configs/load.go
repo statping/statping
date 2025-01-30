@@ -36,9 +36,9 @@ func Save() error {
 		MaxLifeConnections: int(p.GetDuration("MAX_LIFE_CONN").Seconds()),
 		KeycloakClientID:     p.GetString("KEYCLOAK_CLIENT_ID"),
 		KeycloakClientSecret: p.GetString("KEYCLOAK_CLIENT_SECRET"),
-		KeycloakAuthURL:      p.GetString("KEYCLOAK_AUTH_URL"),
-		KeycloakTokenURL:     p.GetString("KEYCLOAK_TOKEN_URL"),
-		KeycloakUserInfoURL:  p.GetString("KEYCLOAK_USER_INFO_URL"),
+		KeycloakEndpointAuth:      p.GetString("KEYCLOAK_ENDPOINT_AUTH"),
+		KeycloakEndpointToken:     p.GetString("KEYCLOAK_ENDPOINT_TOKEN"),
+		KeycloakEndpointUserinfo:  p.GetString("KEYCLOAK_ENDPOINT_USERINFO"),
 		KeycloakScopes:       p.GetString("KEYCLOAK_SCOPES"),
 		KeycloakAdminGroups:  p.GetString("KEYCLOAK_ADMIN_GROUPS"),
 	}
@@ -115,14 +115,14 @@ func LoadConfigs(cfgFile string) (*DbConfig, error) {
 	if db.KeycloakClientSecret != "" {
 		p.Set("KEYCLOAK_CLIENT_SECRET", db.KeycloakClientSecret)
 	}
-	if db.KeycloakAuthURL != "" {
-		p.Set("KEYCLOAK_AUTH_URL", db.KeycloakAuthURL)
+	if db.KeycloakEndpointAuth != "" {
+		p.Set("KEYCLOAK_ENDPOINT_AUTH", db.KeycloakEndpointAuth)
 	}
-	if db.KeycloakTokenURL != "" {
-		p.Set("KEYCLOAK_TOKEN_URL", db.KeycloakTokenURL)
+	if db.KeycloakEndpointToken != "" {
+		p.Set("KEYCLOAK_ENDPOINT_TOKEN", db.KeycloakEndpointToken)
 	}
-	if db.KeycloakUserInfoURL != "" {
-		p.Set("KEYCLOAK_USER_INFO_URL", db.KeycloakUserInfoURL)
+	if db.KeycloakEndpointUserinfo != "" {
+		p.Set("KEYCLOAK_ENDPOINT_USERINFO", db.KeycloakEndpointUserinfo)
 	}
 	if db.KeycloakScopes != "" {
 		p.Set("KEYCLOAK_SCOPES", db.KeycloakScopes)
@@ -155,9 +155,9 @@ func LoadConfigs(cfgFile string) (*DbConfig, error) {
 		SampleData:        p.GetBool("SAMPLE_DATA"),
 		KeycloakClientID:     p.GetString("KEYCLOAK_CLIENT_ID"),
 		KeycloakClientSecret: p.GetString("KEYCLOAK_CLIENT_SECRET"),
-		KeycloakAuthURL:      p.GetString("KEYCLOAK_AUTH_URL"),
-		KeycloakTokenURL:     p.GetString("KEYCLOAK_TOKEN_URL"),
-		KeycloakUserInfoURL:  p.GetString("KEYCLOAK_USER_INFO_URL"),
+		KeycloakEndpointAuth:      p.GetString("KEYCLOAK_ENDPOINT_AUTH"),
+		KeycloakEndpointToken:     p.GetString("KEYCLOAK_ENDPOINT_TOKEN"),
+		KeycloakEndpointUserinfo:  p.GetString("KEYCLOAK_ENDPOINT_USERINFO"),
 		KeycloakScopes:       p.GetString("KEYCLOAK_SCOPES"),
 		KeycloakAdminGroups:  p.GetString("KEYCLOAK_ADMIN_GROUPS"),
 	}

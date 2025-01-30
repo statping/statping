@@ -66,9 +66,9 @@ type OAuth struct {
 	CustomIsOpenID      null.NullBool `gorm:"column:custom_open_id" json:"custom_open_id"`
 	KeycloakClientID     string        `gorm:"column:keycloak_client_id" json:"keycloak_client_id"`
 	KeycloakClientSecret string        `gorm:"column:keycloak_client_secret" json:"keycloak_client_secret" scope:"admin"`
-	KeycloakAuthURL      string        `gorm:"column:keycloak_auth_url" json:"keycloak_auth_url"`
-	KeycloakTokenURL     string        `gorm:"column:keycloak_token_url" json:"keycloak_token_url"`
-	KeycloakUserInfoURL  string        `gorm:"column:keycloak_user_info_url" json:"keycloak_user_info_url"`
+	KeycloakEndpointAuth      string        `gorm:"column:keycloak_endpoint_auth" json:"keycloak_endpoint_auth"`
+	KeycloakEndpointToken     string        `gorm:"column:keycloak_endpoint_token" json:"keycloak_endpoint_token"`
+	KeycloakEndpointUserinfo  string        `gorm:"column:keycloak_endpoint_userinfo" json:"keycloak_endpoint_userinfo"`
 	KeycloakScopes       string        `gorm:"column:keycloak_scopes" json:"keycloak_scopes"`
 	KeycloakAdminGroups  string        `gorm:"column:keycloak_admin_groups" json:"keycloak_admin_groups"`
 	KeycloakIsOpenID     null.NullBool `gorm:"column:keycloak_open_id" json:"keycloak_open_id"`

@@ -54,30 +54,38 @@ func oauthLogin(oauth *oAuth, w http.ResponseWriter, r *http.Request) {
 		Id:       0,
 		Username: oauth.Username,
 		Email:    oauth.Email,
-		Admin:    null.NewNullBool(false),
+		Admin:    null.NewNullBool(true),
 	}
+	log.Infof("OAuth User: %+v", user)
+	log.Infof("OAuth User Groups: %+v", oauth.Groups)
+	log.Infof("core.App.OAuth.KeycloakAdminGroups: %+v", core.App.OAuth.KeycloakAdminGroups)
+
+	isAdmin := false
 
 	// Check if the user is in the Keycloak admin groups
 	if oauth.Groups != nil && core.App.OAuth.KeycloakAdminGroups != "" {
 		adminGroups := strings.Split(core.App.OAuth.KeycloakAdminGroups, ",")
-		for _, group := range adminGroups {
-			if contains(oauth.Groups, group) {
-				user.Admin = null.NewNullBool(true)
+		log.Infof("Admin Groups: %+v", adminGroups)
+	
+		for _, keycloakAdminGroup := range adminGroups {
+			for _, userGroup := range oauth.Groups {
+				log.Infof("Checking if user group '%s' is in admin group '%s'", userGroup, keycloakAdminGroup)
+				if userGroup == keycloakAdminGroup {
+					isAdmin = true // Set the flag to true if a group match is found
+					break
+				}
+			}
+			if user.Admin.Valid && user.Admin.Bool {
 				break
 			}
 		}
 	}
+	user.Admin = null.NewNullBool(isAdmin)
+	log.Infof("OAuth User Admin: %+v", user.Admin)
 	log.Infoln(fmt.Sprintf("OAuth %s User %s logged in from IP %s", oauth.Type(), oauth.Email, r.RemoteAddr))
 	setJwtToken(user, w)
 
 	http.Redirect(w, r, core.App.Domain+"/dashboard", http.StatusPermanentRedirect)
 }
 
-func contains(s []string, str string) bool {
-	for _, v := range s {
-		if v == str {
-			return true
-		}
-	}
-	return false
-}
+
